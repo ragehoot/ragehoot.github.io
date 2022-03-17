@@ -1,7 +1,8 @@
 const width = screen.availWidth;
 const height = screen.availHeight;
 
-function setup() {
+function setup() 
+{
   createCanvas(width, height);
 }
 
@@ -43,13 +44,16 @@ const downPressedMouse = new Set();
 
 
 /**all event keys with length 1 get converted to lowercase*/ 
-window.addEventListener("keydown", function (event) {
-  if (event.defaultPrevented) {
+window.addEventListener("keydown", function (event) 
+{
+  if (event.defaultPrevented) 
+  {
     return;
   }
   
   let temp_str = event.key;
-  if (temp_str.length==1) {
+  if (temp_str.length == 1) 
+  {
     temp_str = temp_str.toLowerCase();
   }
   
@@ -57,35 +61,43 @@ window.addEventListener("keydown", function (event) {
 });
 
 /**all event keys with length 1 get converted to lowercase*/ 
-window.addEventListener("keyup", function (event) {
-  if (event.defaultPrevented) {
+window.addEventListener("keyup", function (event) 
+{
+  if (event.defaultPrevented) 
+  {
     return;
   }
 
   let temp_str = event.key;
-  if (temp_str.length==1) {
+  if (temp_str.length==1) 
+  {
     temp_str = temp_str.toLowerCase();
   }
 
   downPressedKeys.delete(temp_str);
 });
 
-window.addEventListener("mousedown", function (event) {
-  if (event.defaultPrevented) {
+window.addEventListener("mousedown", function (event) 
+{
+  if (event.defaultPrevented) 
+  {
     return;
   }
     downPressedMouse.add(event.key);
 });
 
-window.addEventListener("mouseup", function (event) {
-  if (event.defaultPrevented) {
+window.addEventListener("mouseup", function (event) 
+{
+  if (event.defaultPrevented) 
+  {
     return;
   }
   downPressedMouse.delete(event.key);
 });
 
 class Projectile {
-  constructor(diameter,color,pos_x,pos_y,vel_x,vel_y,acc_x = 0,acc_y = 0) {
+  constructor(diameter,color,pos_x,pos_y,vel_x,vel_y,acc_x = 0,acc_y = 0) 
+  {
     this.diameter = diameter;
     this.color = color;
 
@@ -101,13 +113,15 @@ class Projectile {
     this.acc_y = acc_y;
 
   }
-  draw () {
+  draw () 
+  {
     fill(this.color);
     stroke(this.color_outline);
     circle(this.pos_x,this.pos_y,this.diameter);
   }
 
-  move() {
+  move() 
+  {
     this.pos_x += this.vel_x;
     this.pos_y += this.vel_y;
 
@@ -115,47 +129,60 @@ class Projectile {
     this.vel_y += this.acc_y;
   }
 
-  update(should_draw = true,should_move = true) {
-    if (should_draw) {
+  update(should_draw = true,should_move = true) 
+  {
+    if (should_draw) 
+    {
       this.draw();
     }
-    if (should_move) {
+    if (should_move) 
+    {
       this.move();
     }
   }
 
   /**returns true if should delete projectile, false if should keep projectile */
-  should_destroy(forgiving_x = 0,forgiving_y = 0) {
-    if (this.pos_x-this.diameter/2>width+forgiving_x) {
+  should_destroy(forgiving_x = 0,forgiving_y = 0) 
+  {
+    if (this.pos_x-this.diameter/2>width+forgiving_x) 
+    {
       return true;
     }
-    if (this.pos_x+this.diameter/2<-forgiving_x) {
+    if (this.pos_x+this.diameter/2<-forgiving_x) 
+    {
       return true;
     }
-    if (this.pos_y-this.diameter/2>height+forgiving_y) {
+    if (this.pos_y-this.diameter/2>height+forgiving_y) 
+    {
       return true;
     }
-    if (this.pos_y+this.diameter/2<-forgiving_y) {
+    if (this.pos_y+this.diameter/2<-forgiving_y) 
+    {
       return true;
     }         
     return false;
   }
   
   /**make sure to set arr_proj = update_list(arr_proj) */
-  static update_list(proj_list,should_collide = true,forgiving_x = 0, forgiving_y = 0) {
-    for (let i = 0; i < proj_list.length; i++) {
+  static update_list(proj_list,should_collide = true,forgiving_x = 0, forgiving_y = 0) 
+  {
+    for (let i = 0; i < proj_list.length; i++) 
+    {
       (proj_list[i]).update();
     }
     let proj_list2 = [];
 
-    for (let i = 0; i < proj_list.length; i++) {
-      if (!(proj_list[i]).should_destroy(forgiving_x,forgiving_y)) {
+    for (let i = 0; i < proj_list.length; i++) 
+    {
+      if (!(proj_list[i]).should_destroy(forgiving_x,forgiving_y)) 
+      {
         proj_list2.push(proj_list[i]);
       }
     }
     
 
-    if (should_collide) {
+    if (should_collide) 
+    {
       player.collision(proj_list2);
     } 
 
@@ -166,14 +193,17 @@ class Projectile {
 
 
 
-function distance(x1,y1,x2,y2) {
+function distance(x1,y1,x2,y2) 
+{
  return sqrt((x2-x1)**2+(y2-y1)**2);
 }
 
 
-class Player {
+class Player 
+{
   /**player color is just for the trail*/
-  constructor(pos_x,pos_y,diameter,color,speed,speed_slowed,speed_fast,total_health,immunity_frames) {
+  constructor(pos_x,pos_y,diameter,color,speed,speed_slowed,speed_fast,total_health,immunity_frames) 
+  {
     this.pos_x = pos_x;
     this.pos_y = pos_y;
     this.diameter = diameter;
@@ -184,7 +214,8 @@ class Player {
     this.color_trail_pos_y = [];
     this.color_trail_num = 9;
 
-    for (let i = 0; i < this.color_trail_num; i++) {
+    for (let i = 0; i < this.color_trail_num; i++) 
+    {
       this.color_trail_pos_x.push(pos_x);
       this.color_trail_pos_y.push(pos_y);
     }
@@ -202,17 +233,23 @@ class Player {
     this.total_immunity_frames = immunity_frames;
 
   }
-  draw() {
-    if (this.immunity()) {
-      for (let i = 0; i < this.color_trail_num; i++) {
+  draw() 
+  {
+    if (this.immunity()) 
+    {
+      for (let i = 0; i < this.color_trail_num; i++) 
+      {
         fill(player.color);
         stroke(player.color);
         circle(this.color_trail_pos_x[i],this.color_trail_pos_y[i],25-i*3);
       }
       fill([255,255,255]);
       circle(this.pos_x,this.pos_y,this.diameter);
-    } else {
-      for (let i = 0; i < this.color_trail_num; i++) {
+    } 
+    else 
+    {
+      for (let i = 0; i < this.color_trail_num; i++) 
+      {
         fill([255,0,0]);
         stroke([255,0,0]);
         circle(this.color_trail_pos_x[i],this.color_trail_pos_y[i],25-i*3);
@@ -223,29 +260,39 @@ class Player {
     }
   }
   
-  move() {
+  move() 
+  {
     let temp_move_x = 0,temp_move_y = 0;
     //the capital thing should probs never occur
-    if (downPressedKeys.has('w') || downPressedKeys.has('ArrowUp')) {
+    if (downPressedKeys.has('w') || downPressedKeys.has('ArrowUp')) 
+    {
       temp_move_y-=1;
     }
-    if (downPressedKeys.has('s') || downPressedKeys.has('ArrowDown')) {
+    if (downPressedKeys.has('s') || downPressedKeys.has('ArrowDown')) 
+    {
       temp_move_y+=1;
     }
-    if (downPressedKeys.has('a') || downPressedKeys.has('ArrowLeft')) {
+    if (downPressedKeys.has('a') || downPressedKeys.has('ArrowLeft')) 
+    {
       temp_move_x-=1;
     }
-    if (downPressedKeys.has('d') || downPressedKeys.has('ArrowRight')) {
+    if (downPressedKeys.has('d') || downPressedKeys.has('ArrowRight')) 
+    {
       temp_move_x+=1;
     }
 
-    if (downPressedKeys.has('Shift')) {
+    if (downPressedKeys.has('Shift')) 
+    {
       this.pos_x += temp_move_x * this.speed_slowed;
       this.pos_y += temp_move_y * this.speed_slowed;
-    } else if (downPressedMouse.has(undefined)) {
+    } 
+    else if (downPressedMouse.has(undefined)) 
+    {
       this.pos_x += temp_move_x * this.speed_fast;
       this.pos_y += temp_move_y * this.speed_fast;
-    } else {
+    } 
+    else 
+    {
       this.pos_x += temp_move_x * this.speed;
       this.pos_y += temp_move_y * this.speed;
     }
@@ -258,43 +305,53 @@ class Player {
     this.color_trail_pos_y.splice(this.color_trail_pos_y.length-1,1);
 
     //out of bounds check
-    if (this.pos_x > width) {
+    if (this.pos_x > width) 
+    {
      this.pos_x = width; 
     }
-    if (this.pos_x < 0) {
+    if (this.pos_x < 0) 
+    {
      this.pos_x = 0; 
     }
-    if (this.pos_y > height) {
+    if (this.pos_y > height) 
+    {
      this.pos_y = height; 
     }
-    if (this.pos_y < 0) {
+    if (this.pos_y < 0) 
+    {
      this.pos_y = 0; 
     }
 
     return;
   }
 
-  update() {
+  update() 
+  {
     this.current_immunity_frames+=1;
     this.move();
     this.draw();
   }
 
-  immunity() {
-    if (this.current_immunity_frames>this.total_immunity_frames) {
+  immunity() 
+  {
+    if (this.current_immunity_frames>this.total_immunity_frames) 
+    {
       return true;
     }
     return false;
   }
 
-  lose_health() {
-    if (this.immunity()) {
+  lose_health() 
+  {
+    if (this.immunity()) 
+    {
       this.current_immunity_frames = 0;
       this.current_health -= 1;
     }
   }
 
-  collision(proj_list) {
+  collision(proj_list) 
+  {
     for (let i = 0; i < proj_list.length; i++)
       if ( (this.pos_x-proj_list[i].pos_x)**2+(this.pos_y-proj_list[i].pos_y)**2  < (this.diameter+proj_list[i].diameter-4)**2 / 4 )
       {
@@ -304,7 +361,8 @@ class Player {
     return;
   }
 
-  is_alive() {
+  is_alive() 
+  {
     return this.current_health > 0;
   }
 }
@@ -319,26 +377,34 @@ let player = new Player(width/4,height/2,25,[0,0,255],5,2,12,35,120);
 
 
 
-function update_main_loop(){
+function update_main_loop()
+{
   timer +=1;
   background(255,255,255);
 
-  if (timer % timerMod == 0) {
-    for (let i = 0; i < 3; i++) {
+  if (timer % timerMod == 0) 
+  {
+    for (let i = 0; i < 3; i++) 
+    {
       arrcoloradd[i] += arrcolorincr[i];
-      if (arrcoloradd[i] <= 0) {
+      if (arrcoloradd[i] <= 0) 
+      {
         arrcoloradd[i] = 0;
         arrcolorincr[i] = Math.random()*5
       }
-      if (arrcoloradd[i] >= 255) {
+      if (arrcoloradd[i] >= 255) 
+      {
         arrcoloradd[i] = 255;
         arrcolorincr[i] = -Math.random()*5
       }
     }
-    if (random_randnum == 2) {
+    if (random_randnum == 2) 
+    {
       angle += angleAdd;
       angle2 -= angle2Add;
-    } else {
+    } 
+    else 
+    {
       angle += speed;
       angle2 -= speed2;
     }
