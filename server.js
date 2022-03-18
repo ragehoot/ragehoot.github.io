@@ -13,6 +13,8 @@ const Ably = require("ably");
 const app = express();
 const {ABLY_API_KEY, PORT} = process.env;
 
+const globalGameName = "main-game-thread";
+let globalChannel;
 
 let rooms = {};
 // increment id for every new room
@@ -30,7 +32,7 @@ const realtime = Ably.Realtime({
 });
 console.log("connected to Ably");
 
-app.use(express.static("public"));
+app.use(express.static(__dirname));
 
 app.get("/auth", (request, response) => {
     const tokenParams = { clientId: uniqueId() };
@@ -61,6 +63,19 @@ app.get("/quizselect", (request, response) => {
     console.log("quizselect.html sent");
 });
 
+app.get("/game", (request, response) => {
+    let requestedRoom = request.query.roomCode;
+    if (rooms[requestedRoom]) {
+        response.sendFile(__dirname + "/game.html");
+    } else {
+        response.sendFile(__dirname + "/index.html");
+    }
+});
+
+app.get("/create", (request, response) => {
+    generateNewGameThread(request);
+});
+
 const listener = app.listen(PORT, () => {
     console.log("Listening on port " + listener.address().port);
 });
@@ -70,9 +85,7 @@ realtime.connection.once("connected", () => {
     globalChannel = realtime.channels.get(globalGameName);
     // subscribe to new players entering the game
     globalChannel.presence.subscribe("new-room", (room) => {
-        generateNewGameThread(
-            room.quizId
-        );
+       generateNewGameThread(room.quizId);
     });
 });
 
