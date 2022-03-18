@@ -13,7 +13,6 @@ const Ably = require("ably");
 const app = express();
 const {ABLY_API_KEY, PORT} = process.env;
 
-const TICK_MS = 100;
 
 let rooms = {};
 // increment id for every new room
@@ -57,6 +56,11 @@ app.get("/", (request, response) => {
     console.log("index.html sent");
 });
 
+app.get("/quizselect", (request, response) => {
+    response.sendFile(__dirname + "/quizselect.html");
+    console.log("quizselect.html sent");
+});
+
 const listener = app.listen(PORT, () => {
     console.log("Listening on port " + listener.address().port);
 });
@@ -73,11 +77,9 @@ realtime.connection.once("connected", () => {
 });
 
 // create new game threads for each room
-function generateNewGameThread(
-    quizId
-) {
+function generateNewGameThread(quizId) {
     if (isHost && isMainThread) {
-        const worker = new Worker("./server-worker.js", {
+        const worker = new Worker("./worker.js", {
             workerData: {
                 roomCode: roomId++,
                 quizId: quizId
@@ -88,14 +90,14 @@ function generateNewGameThread(
             console.log(`WORKER EXITED DUE TO AN ERROR ${error}`);
         });
         worker.on("message", (msg) => {
-            if (msg.roomName && !msg.resetEntry) {
-                rooms[msg.roomName] = {
-                    roomName: msg.roomName,
+            if (msg.roomCode && !msg.resetEntry) {
+                rooms[msg.roomCode] = {
+                    roomCode: msg.roomCode,
                     totalPlayers: msg.totalPlayers,
                     gameOn: msg.gameOn
                 };
-            } else if (msg.roomName && msg.resetEntry) {
-                delete rooms[msg.roomName];
+            } else if (msg.roomCode && msg.resetEntry) {
+                delete rooms[msg.roomCode];
             }
         });
         worker.on("exit", (code) => {
@@ -105,4 +107,4 @@ function generateNewGameThread(
             }
         });
     }
-  }
+}
