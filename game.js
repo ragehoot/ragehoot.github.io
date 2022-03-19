@@ -29,7 +29,25 @@ realtime.connection.once("connected", () =>
   // wait for game to start
   gameRoomChannel.subscribe("start", (msg) => 
   {
-    // do start code or whatever
+    console.log("starting game");
+  });
+
+  // update game data
+  gameRoomChannel.subscribe("game-state", (msg) => 
+  {
+
+  });
+
+  // load new question
+  gameRoomChannel.subscribe("question", (msg) => 
+  {
+
+  });
+
+  // game end
+  gameRoomChannel.subscribe("game-end", (msg) =>
+  {
+
   });
 });
 

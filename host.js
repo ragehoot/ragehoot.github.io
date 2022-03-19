@@ -15,14 +15,25 @@ const realtime = Ably.Realtime({
 
 realtime.connection.once("connected", () => {
     globalChannel = realtime.channels.get(globalGameName);
-    gameRoomChannel = realtime.channels.get(roomCode + ":primary");
+    gameRoomChannel = realtime.channels.get(myRoomCode + ":primary");
 
     globalChannel.presence.enter({
         quizId: myQuizId,
         roomCode: myRoomCode
     });
 
-    gameRoomChannel.subscribe("game-state", (data) => {
+    // load new game state
+    gameRoomChannel.subscribe("game-state", (msg) => {
+
+    });
+
+    // load new question
+    gameRoomChannel.subscribe("question", (msg) => {
+
+    });
+
+    // game end
+    gameRoomChannel.subscribe("game-end", (msg) => {
 
     });
 
@@ -31,5 +42,9 @@ realtime.connection.once("connected", () => {
 
 
 document.getElementById("start-button").addEventListener("click", function() {
-    gameRoomChannel.publish("start");
+    gameRoomChannel.publish("start", {
+        start: true
+    });
 });
+
+// TODO: draw game
