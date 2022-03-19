@@ -63,12 +63,14 @@ app.get("/", (request, response) => {
         "Origin, X-Requested-With, Content-Type, Accept"
     );
     response.sendFile(__dirname + "/index.html");
-    console.log("index.html sent");
+});
+
+app.get("/gamesingle", (request, response) => {
+    response.sendFile(__dirname + "/gamesingle.html");
 });
 
 app.get("/quizselect", (request, response) => {
     response.sendFile(__dirname + "/quizselect.html");
-    console.log("quizselect.html sent");
 });
 
 app.get("/game", (request, response) => {

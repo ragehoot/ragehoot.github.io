@@ -1,6 +1,6 @@
-Hackathon by the Sea 2022
+## Hackathon by the Sea 2022
 
-Bullet Quiz
+## Bullet Quiz
 
 Michael Liu, Sahan Wijetunga, Darmal Tarazi, Alvin Lee
 
