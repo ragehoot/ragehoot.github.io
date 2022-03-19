@@ -57,7 +57,8 @@ realtime.connection.once("connected", () =>
 const width = screen.availWidth-200;
 const height = screen.availHeight;
 
-function setup() {
+function setup() 
+{
   createCanvas(width+200, height);
 }
 
@@ -80,7 +81,8 @@ const downPressedMouse = new Set();
 
 
 /**all event keys with length 1 get converted to lowercase*/ 
-window.addEventListener("keydown", function (event) {
+window.addEventListener("keydown", function (event) 
+{
   if (event.defaultPrevented) {
     return;}
   
@@ -90,27 +92,37 @@ window.addEventListener("keydown", function (event) {
   
     downPressedKeys.add((temp_str));})
 /**all event keys with length 1 get converted to lowercase*/ 
-window.addEventListener("keyup", function (event) {
+window.addEventListener("keyup", function (event) 
+{
   if (event.defaultPrevented) {
     return;}
 
   let temp_str = event.key;
   if (temp_str.length==1){
-    temp_str = temp_str.toLowerCase();}
+    temp_str = temp_str.toLowerCase();
+  }
 
-  downPressedKeys.delete((temp_str));})
+  downPressedKeys.delete((temp_str));
+});
 
-window.addEventListener("mousedown", function (event) {
-  if (event.defaultPrevented) {
-    return;}
-    downPressedMouse.add(event.key);})
-window.addEventListener("mouseup", function (event) {
-  if (event.defaultPrevented) {
+window.addEventListener("mousedown", function (event) 
+{
+  if (event.defaultPrevented) 
+  {
     return;
   }
-  downPressedMouse.delete(event.key);})
+    downPressedMouse.add(event.key);})
+window.addEventListener("mouseup", function (event) 
+{
+  if (event.defaultPrevented) 
+  {
+    return;
+  }
+  downPressedMouse.delete(event.key);
+});
 
-class Projectile{
+class Projectile
+{
   constructor(radius,color,pos_x,pos_y,vel_x,vel_y,acc_x = 0,acc_y = 0)
   {
     this.radius = radius;
@@ -199,7 +211,8 @@ class Projectile{
   }
 }
 
-class Player {
+class Player 
+{
   /**player color is just for the trail*/
   constructor(pos_x,pos_y,radius,color,speed,speed_slowed,speed_fast,total_health,immunity_frames) {
     this.pos_x = pos_x;
@@ -248,7 +261,8 @@ class Player {
       fill([255,255,255]);
       circle(this.pos_x,this.pos_y,this.radius*2);
     }
-    else{
+    else
+    {
       for (let i = 0; i < this.color_trail_num; i++)
       {
         fill([255,0,0]);
@@ -291,7 +305,8 @@ class Player {
       this.pos_x += temp_move_x * this.speed_fast;
       this.pos_y += temp_move_y * this.speed_fast;
     }
-    else{
+    else
+    {
       this.pos_x += temp_move_x * this.speed;
       this.pos_y += temp_move_y * this.speed;
     }
@@ -331,8 +346,10 @@ class Player {
     this.draw();
   }
 
-  immunity() {
-    if (this.current_immunity_frames>this.total_immunity_frames) {
+  immunity() 
+  {
+    if (this.current_immunity_frames>this.total_immunity_frames) 
+    {
       return true;
     }
     return false;
@@ -347,7 +364,8 @@ class Player {
     }
   }
 
-  collision(proj_list) {
+  collision(proj_list) 
+  {
     for (let i = 0; i < proj_list.length; i++)
       if (  (this.pos_x-proj_list[i].pos_x)**2+(this.pos_y-proj_list[i].pos_y)**2  < (this.radius+proj_list[i].radius-3)**2)
       {
@@ -357,12 +375,14 @@ class Player {
     return;
   }
 
-  is_alive() {
+  is_alive() 
+  {
     return this.current_health > 0;
   }
 }
 
-function distance(x1,y1,x2,y2) {
+function distance(x1,y1,x2,y2) 
+{
   return sqrt((x2-x1)**2+(y2-y1)**2);
 }
 
@@ -389,7 +409,8 @@ function draw_line(x1,y1,x2,y2,color)
 
 //https://stackoverflow.com/questions/1527803/generating-random-whole-numbers-in-javascript-in-a-specific-range
 /** the min must be lower than the max */
-function random_int(min, max) {
+function random_int(min, max) 
+{
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -463,7 +484,8 @@ class Main_update_class
     }
 
     //only executes attack after a cretain amnt of time
-    if (this.timer>100){
+    if (this.timer>100)
+    {
       this.spiral_1_angle+=this.spiral_1_angle_incr;
       this.spiral_1_angle_acc+=this.spiral_1_angle_incr_acc;
 
@@ -499,7 +521,8 @@ class Main_update_class
 
   spiral_2(difficulty)
   {
-    if (!this.attack_started){
+    if (!this.attack_started)
+    {
       this.spiral_2_initializer();
     }
 
@@ -774,7 +797,6 @@ class Main_update_class
 let main_update_object = new Main_update_class(); // USED FOR ALL ATTACKS
 
 
-
 let global_questions = [
 'What is the integral of 2x?'
 ,'Who is the first president of the United States'
@@ -920,16 +942,16 @@ function start_new_question()
     answer_boxes[i].style.fontSize = 150 / Math.sqrt(temp_text.length) + "px";
     answer_boxes[i].style.backgroundColor = "rgba(255,220,220)";
     /**for (let i = 0; i<4; i++)
-  {
-    if (global_current_answers[i] !=0)
     {
-      answer_boxes[i].style.backgroundColor = "red";
-    }
-    else
-    {
-      answer_boxes[i].style.backgroundColor = "green";
-    }
-  } */
+      if (global_current_answers[i] !=0)
+      {
+        answer_boxes[i].style.backgroundColor = "red";
+      }
+      else
+      {
+        answer_boxes[i].style.backgroundColor = "green";
+      }
+    } */
   }
 }
 
@@ -1008,6 +1030,7 @@ function update_main_loop(){
   {
     question_ended();
   }
+
   if (global_timer> global_time_wait[global_current_qa_num])
   {
     let should_end_attack = main_update_object.update_main(global_attack_difficulty);
@@ -1022,15 +1045,14 @@ function update_main_loop(){
         global_score+=Math.log(player.current_immunity_frames)*global_point_multiplier/20;
         global_timer_text_box.style.color = "black";
       }
-      else{
+      else
+      {
         global_score -= (5/Math.sqrt(global_point_multiplier));
         global_timer_text_box.style.color = "red";
       }
   
       global_timer_text_box.innerHTML = Math.floor(global_score)+"";
     }
-
-
   }
 
   player.update();
@@ -1039,10 +1061,4 @@ function update_main_loop(){
   draw_line(width/2,0,width/2,height,[0,0,0]);
 }
 
-
 setInterval(update_main_loop,1000/60);
-
-
-
-
-
