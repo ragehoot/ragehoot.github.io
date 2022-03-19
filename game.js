@@ -1,5 +1,5 @@
 // server connectivity
-
+let global_continue_waiting_for_start_really_long_variable_name_hello_future_viewers = true;
 // CHANGE LATER IF SWITCHING SERVER
 const BASE_SERVER_URL = "http://ragehoot.ydns.eu";
 
@@ -411,7 +411,7 @@ function draw_line(x1,y1,x2,y2,color)
 //https://stackoverflow.com/questions/1527803/generating-random-whole-numbers-in-javascript-in-a-specific-range
 /** the min must be lower than the max */
 
-//global_rand_arr = [Math.random(),Math.random(),Math.random(),Math.random()];
+global_rand_arr = [Math.random(),Math.random(),Math.random(),Math.random()];
 function random_int(min, max) 
 {
   min = Math.ceil(min);
@@ -1110,9 +1110,6 @@ function update_main_loop(){
       }
     }
 
-    draw_line(0,height/2,width,height/2,[0,0,0]);
-    draw_line(width/2,0,width/2,height,[0,0,0]);
-
     for (const p_id in global_player_arr) {
 
       let curPlayer = global_player_arr[p_id];
@@ -1139,6 +1136,8 @@ function update_main_loop(){
     }
   } 
   player.update();
+  draw_line(0,height/2,width,height/2,[0,0,0]);
+  draw_line(width/2,0,width/2,height,[0,0,0]);
 }
 
 // XY
