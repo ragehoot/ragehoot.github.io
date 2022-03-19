@@ -67,7 +67,8 @@ realtime.connection.once("connected", () => {
 // starts the game
 function gameTick() {
     gameRoomChannel.publish("game-state", {
-        playerList: players
+        playerList: players,
+        playerCount: totalPlayers
     });
     tickCounter++;
 }

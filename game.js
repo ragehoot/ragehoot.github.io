@@ -845,7 +845,7 @@ let global_answers = [
 ]
 
 //make sure its in 60 fps -- > value of 120 would be 2 seconds
-let global_time_wait = [320,320,320,320,320,320,320,320,320,320];
+let global_time_wait = 320;
 
 let question_box = document.createElement('div');
 question_box.style.position = "absolute";
@@ -1050,12 +1050,12 @@ function update_main_loop()
     global_timer+=1;
 
     //console.log(downPressedKeys);
-    if (global_timer == global_time_wait[global_current_qa_num])
+    if (global_timer == global_time_wait)
     {
       question_ended();
     }
 
-    if (global_timer> global_time_wait[global_current_qa_num])
+    if (global_timer> global_time_wait)
     {
       if (global_timer%85==0)
       {
@@ -1155,7 +1155,7 @@ function publish_position()
   {
     x: Math.floor(player.pos_x),
     y: Math.floor(player.pos_y),
-    score: global_score,
+    score: Math.floor(global_score),
     iframes: player.current_immunity_frames
   }); // player.current_immunity_frames
 }  
