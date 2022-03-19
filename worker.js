@@ -1,3 +1,4 @@
+// DEPRECATED AFTER SWITCHING FROM ABLY
 const {
   Worker,
   isMainThread,
