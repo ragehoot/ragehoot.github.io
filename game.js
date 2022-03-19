@@ -20,9 +20,9 @@ const realtime = Ably.Realtime(
 
 let global_rand_arr = []; 
 
-for (let i = 0; i < 53; i++) {
-  global_rand_arr.push(Math.random());
-}
+// for (let i = 0; i < 53; i++) {
+//   global_rand_arr.push(Math.random());
+// }
 
 /*
 global_player_arr = {
@@ -47,6 +47,7 @@ realtime.connection.once("connected", () =>
   {
     global_rand_arr = msg.data.randomArr;
     global_continue_waiting_for_start_really_long_variable_name_hello_future_viewers = false;
+    start_new_question();
   });
   
   /* removed because sending random arr signals start
@@ -464,8 +465,8 @@ class Main_update_class
       this.SPIRAL_4,this.EXAMPLE_ATTACK,
       this.SPIRAL_4,this.SPIRAL_2,
       this.SPIRAL_4,this.SPIRAL_1,
-      this.SPIRAL_4,this.SPIRAL_3, 
-      this.SPIRAL_4,this.KHELO_ATTACK];
+      this.SPIRAL_4,this.SPIRAL_3,
+    ];
     this.attack_index = 0;
   }
 
@@ -967,8 +968,6 @@ function start_new_question()
     answer_boxes[i].style.backgroundColor = "rgba(255,220,220)";
   }
 }
-
-start_new_question();
 
 //higher the number easier the difficulty
 let global_attack_difficulty = 3;
