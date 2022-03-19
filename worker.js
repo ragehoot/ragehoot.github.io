@@ -10,7 +10,7 @@ const Ably = require("ably");
 
 const ABLY_API_KEY = process.env.ABLY_API_KEY;
 
-const TICK_MS = 500;
+const TICK_MS = 1000;
 
 let players = {};
 let totalPlayers = 0;

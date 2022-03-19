@@ -60,7 +60,13 @@ function scoreboardUpdate() {
     for (const p_id in global_player_arr) {
         scores.push([global_player_arr[p_id].score, global_player_arr[p_id].nickname]);
     }
-    scores.sort();
+    scores.sort(function comp(a, b) {
+        let ai = parseInt(a);
+        let bi = parseInt(b);
+        if (ai == bi) return 0;
+        else if (ai < bi) return -1;
+        else return 1;
+    });
     console.log(scores);
     for (let i = 1; i <= 5; i++) {
         if (i > totalPlayers) break;
