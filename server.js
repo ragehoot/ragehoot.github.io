@@ -65,7 +65,7 @@ app.get("/quizselect", (request, response) => {
 
 app.get("/game", (request, response) => {
     let requestedRoom = request.query.roomCode;
-    if (rooms[requestedRoom]) {
+    if (rooms[requestedRoom] || requestedRoom==1) {
         response.sendFile(__dirname + "/game.html");
     } else {
         response.sendFile(__dirname + "/index.html");

@@ -1,3 +1,31 @@
+// server connectivity
+
+// CHANGE LATER IF SWITCHING SERVER
+const BASE_SERVER_URL = "http://ragehoot.ydns.eu";
+
+let globalChannel;
+let myClientId;
+let myChannel;
+let gameRoomName;
+
+const nickname = localStorage.getItem("nickname");
+const roomCode = localStorage.getItem("roomCode");
+
+// connect to Ably
+const realtime = Ably.Realtime({
+    authUrl: BASE_SERVER_URL + "/auth",
+});
+
+realtime.connection.once("connected", () => {
+    myClientId = realtime.auth.clientId;
+    //gameRoom = realtime.channels.get("game-room");
+    //myChannel = realtime.channels.get("clientChannel-" + myClientId);
+    gameRoom.presence.enter(myNickname);
+});
+
+
+// game drawing
+
 const width = screen.availWidth;
 const height = screen.availHeight;
 
