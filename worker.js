@@ -16,6 +16,8 @@ let players = {};
 let totalPlayers = 0;
 let gameRoomChannel;
 let gameCode = workerData.roomCode;
+let gameInterval;
+let tickCounter = 0;
 
 // instantiate to Ably
 const realtime = Ably.Realtime({
@@ -31,11 +33,13 @@ realtime.connection.once("connected", () => {
         console.log(gameCode + ": new player");
         let newPlayerId = player.clientId;
         totalPlayers++;
+        // MAKE SURE TO UPDATE THIS WITH NECESSARY DATA
         players[newPlayerId] = {
             id: newPlayerId,
             x: 0,
             y: 0,
             score: 0,
+            iframes: 0,
             nickname: player.data.nickname,
         };
     });
@@ -45,21 +49,41 @@ realtime.connection.once("connected", () => {
         delete players[player.clientId];
     });
 
+    gameRoomChannel.subscribe("player-data", (player) => {
+        players[player.clientId].x = player.data.x;
+        players[player.clientId].y = player.data.y;
+        players[player.clientId].score = player.data.score;
+        players[player.clientId].iframes = player.data.iframes;
+    });
+
     // wait for game to start
     gameRoomChannel.subscribe("start", (msg) => {
-        console.log("starting game");
+        console.log("starting game, code: " + gameCode);
+        sendAttack();
+        gameInterval = setInterval(gameTick, TICK_MS);
     });
 });
 
 
 // starts the game
-const startGame = function() {
-    let tickInterval = setInterval(() => {
-        gameRoomChannel.publish("game-state", {
-            playerList: players,
-            playerCount: totalPlayers,
-        });
-    }, TICK_MS);
+function gameTick() {
+    gameRoomChannel.publish("game-state", {
+        playerList: players
+    });
+    tickCounter++;
 }
 
-// TODO, simulate game data
+function sendAttack() {
+    let randArr = [];
+    for (let i = 0; i < 50; i++) {
+        randArr.push(Math.random());
+    }
+    let randInt = Math.floor(Math.random() * 10);
+    gameRoomChannel.publish("random-arr", {
+        randomArr: randArr,
+    });
+}
+
+function gameEnd() {
+    clearInterval(gameInterval);
+}
