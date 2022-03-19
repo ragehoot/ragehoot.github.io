@@ -40,11 +40,14 @@ realtime.connection.once("connected", () => {
     document.getElementById("code").innerText += myRoomCode;
 });
 
+let startButton = document.getElementById("start-button");
 
-document.getElementById("start-button").addEventListener("click", function() {
+startButton.addEventListener("click", function() {
     gameRoomChannel.publish("start", {
         start: true
     });
+    startButton.remove();
 });
+
 
 // TODO: draw game
