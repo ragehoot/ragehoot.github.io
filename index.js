@@ -14,3 +14,8 @@ document.getElementById("join-button").addEventListener("click", function() {
     localStorage.setItem("nickname", nickname);
     window.location.href = "/game?roomCode=" + gameCode;
 });
+
+
+document.getElementById("singleplayer-button").addEventListener("click", function() {
+    window.location.href = "/gamesingle";
+});
