@@ -427,7 +427,7 @@ class Main_update_class
 
     this.SPIRAL_3 = 4; // a more complex attack
     this.SPIRAL_4 = 5;
-    
+    this.KHELO_ATTACK = 6;
 
     this.ATTACK_INDEX_RETURN_TO = 0; // index in the array
 
@@ -435,7 +435,8 @@ class Main_update_class
       this.SPIRAL_4,this.EXAMPLE_ATTACK,
       this.SPIRAL_4,this.SPIRAL_2,
       this.SPIRAL_4,this.SPIRAL_1,
-      this.SPIRAL_4,this.SPIRAL_3];
+      this.SPIRAL_4,this.SPIRAL_3, 
+      this.KHELO_ATTACK];
     this.attack_index = 0;
   }
 
@@ -627,13 +628,55 @@ class Main_update_class
     }
     return false;
   }
-
+  khelo_attack_intializer()
+  {
+    this.attack_started=true;
+   
+    this.khelo_attack_time_end = 100*20
+ 
+    this.khelo_attack_time_end = 0;
+  }
+ 
+  khelo_attack()
+  {
+    if (!this.attack_started)
+    {
+      this.khelo_attack_initializer();
+    }
+ 
+    this.khelo_attack_angle += Math.PI/2+0.01;
+ 
+    //player position
+    //player.pos_x
+    //player.pos_y
+ 
+    // let temp_vel_x = -(width/2-player.pos_x);
+    // let temp_vel_y = -(height/2-player.pos_y);
+    // let temp_dist = distance(width/2,height/2,player.pos_x,player.pos_y);
+    // temp_vel_x/=temp_dist;
+    // temp_vel_y/=temp_dist;
+ 
+    if (this.timer%3 == 0)
+    {
+      let temp_proj = new Projectile(25,[255,0,0],width/2,height/2
+      ,1,1
+      ,0,0);
+     
+      this.projectiles.push(temp_proj);
+ 
+      temp_proj = new Projectile(25,[255,0,0],width/2,height/2
+      ,4 * Math.cos(-this.khelo_attack_angle+0.4),6 * Math.sin(-this.khelo_attack_angle+0.4)
+      ,0,0);
+       
+      this.projectiles.push(temp_proj);
+    }
+  }
   example_attack_initializer()
   {
     this.attack_started = true;
-
-    this.example_attack_time_end = 60*10;
-
+ 
+    this.example_attack_time_end = 60*20;
+ 
     this.example_attack_angle = 0;
   }
 
@@ -699,6 +742,10 @@ class Main_update_class
         
         case this.EXAMPLE_ATTACK:
           finished_attack = this.example_attack(difficulty);
+          break
+
+        case this.KHELO_ATTACK:
+          finished_attack = this.khelo_attack();
           break
 
         default:
