@@ -63,7 +63,7 @@ startButton.addEventListener("click", function() {
     // gameRoomChannel.publish("start", {
     //     start: true
     // });
-    socket.emit("start:" + myRoomCode, {
+    socket.emit("start", {
         gameCode: myRoomCode
     });
     startButton.remove();

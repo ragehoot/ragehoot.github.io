@@ -16,7 +16,7 @@ const { SocketAddress } = require("net");
 const path = require("path");
 const socketIO = require("socket.io");
 const { isObject } = require("util");
-const TICK_MS = 1000/30;
+const TICK_MS = 30;
 
 const app = express();
 const {PORT} = process.env;
@@ -28,7 +28,7 @@ const io = socketIO(server);
 
 let rooms = {};
 let tickCounter = {};
-let gameIntervals = {};
+let gameInterval;
 
 
 app.use(express.static(__dirname));
@@ -120,41 +120,47 @@ io.on("connection", function (socket) {
             playerCount: 0,
             started: false
         };
-        socket.on("player-state:" + newCode, (data) => {
-            let newCode = data.gameCode;
-            let playerId = data.clientId;
-            rooms[newCode].players[playerId] = data.player;
-        });
-        socket.on("new-player:"+newCode, (data) => {
-            //rooms[data.gameCode].players[data.player.playerID] = data.player;
-            rooms[data.gameCode].playerCount++;
-        })
-        socket.on("start:" + newCode, (data) => {
-            let newCode = data.gameCode;
-            let arr = [];
-            for (let i = 0; i < 53; i++) {
-                arr.push(Math.random());
-            }
-            io.sockets.emit("random-arr:" + newCode, {
-                randArr: arr
-            });
-        });
-        gameIntervals[newCode] = setInterval(gameTick(newCode), TICK_MS);
+        
+        //gameIntervals[newCode] = setInterval(gameTick(), TICK_MS);
     });
 
     // when a host disconnects
     socket.on("disconnect", () => {
         // TODO: Complete this
     });
+
+    socket.on("player-state", (data) => {
+        let playerId = data.clientId;
+        if (rooms[data.gameCode] != null) rooms[data.gameCode].players[playerId] = data.player;
+    });
+    socket.on("new-player", (data) => {
+        //rooms[data.gameCode].players[data.player.playerID] = data.player;
+        rooms[data.gameCode].playerCount++;
+    })
+    socket.on("start", (data) => {
+        let newCode = data.gameCode;
+        let arr = [];
+        for (let i = 0; i < 53; i++) {
+            arr.push(Math.random());
+        }
+        io.sockets.emit("random-arr:" + newCode, {
+            randArr: arr
+        });
+    });
 });
 
-function gameTick(gameCode) {
-    io.sockets.emit("game-state:" + gameCode, {
-        players: rooms[gameCode].players,
-        playerCount: rooms[gameCode].playerCount
-    });
-    tickCounter[gameCode]++;
+function gameTick() {
+    for (gameCode in rooms) {   
+        io.sockets.emit("game-state:" + gameCode, {
+            players: rooms[gameCode].players,
+            playerCount: rooms[gameCode].playerCount
+        });
+        tickCounter[gameCode]++;
+    }
 }
+
+gameInterval = setInterval(gameTick, TICK_MS);
+
 
 // DEPRECATED AFTER SWITCHING FROM ABLY
 // create new game threads for each room

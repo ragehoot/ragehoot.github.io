@@ -24,7 +24,9 @@ const uniqueId = function() {
     return "id-" + Math.random().toString(36).substr(2, 16);
 }
 
+//should probably change this
 const myId = uniqueId();
+myClientId = myId;
 
 let global_rand_arr = []; 
 
@@ -43,7 +45,7 @@ let global_player_arr;
 
 let global_rand_arr_index = 0;
 
-socket.emit("new-player:" + roomCode, {
+socket.emit("new-player", {
   gameCode: roomCode
 });
 
@@ -53,6 +55,8 @@ socket.on("game-state:"+ roomCode, (data) => {
 
 socket.on("random-arr:" + roomCode, (data) => {
   global_rand_arr = data.randArr;
+  global_continue_waiting_for_start_really_long_variable_name_hello_future_viewers = false;
+  start_new_question();
 });
 
 // realtime.connection.once("connected", () => 
@@ -1267,14 +1271,15 @@ function publish_position()
   //   score: Math.floor(global_score),
   //   iframes: player.current_immunity_frames
   // }); // player.current_immunity_frames
-  io.sockets.emit("player-state:" + roomCode, {
+  socket.emit("player-state", {
     clientId: myId,
     gameCode: roomCode,
     player: {
       x: Math.floor(player.pos_x),
       y: Math.floor(player.pos_y),
       score: Math.floor(global_score),
-      iframes: player.current_immunity_frames
+      iframes: player.current_immunity_frames,
+      nickname: myNickname
     }
   })
 }  
