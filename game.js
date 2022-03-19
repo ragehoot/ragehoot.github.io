@@ -51,33 +51,15 @@ realtime.connection.once("connected", () =>
   });
 });
 
-
-// game drawing
-
-const width = screen.availWidth-200;
+const width = screen.availWidth-300;
 const height = screen.availHeight;
 
 function setup() {
-  createCanvas(width+200, height);
+  createCanvas(width+300, height);
 }
 
 const downPressedKeys = new Set();
 const downPressedMouse = new Set();
-
-// window.addEventListener("resize", function (event) {
-//   if (event.defaultPrevented) {
-//     return; // Do nothing if the event was already processed
-//   }
-
-//   width = screen.availWidth;
-//   height = screen.availHeight;
-
-//   function setup() {
-//     createCanvas(width, height);
-//   }
-// }
-// )
-
 
 /**all event keys with length 1 get converted to lowercase*/ 
 window.addEventListener("keydown", function (event) {
@@ -199,7 +181,8 @@ class Projectile{
   }
 }
 
-class Player {
+class Player 
+{
   /**player color is just for the trail*/
   constructor(pos_x,pos_y,radius,color,speed,speed_slowed,speed_fast,total_health,immunity_frames) {
     this.pos_x = pos_x;
@@ -435,14 +418,15 @@ class Main_update_class
       this.SPIRAL_4,this.EXAMPLE_ATTACK,
       this.SPIRAL_4,this.SPIRAL_2,
       this.SPIRAL_4,this.SPIRAL_1,
-      this.SPIRAL_4,this.SPIRAL_3];
+      this.SPIRAL_4,this.SPIRAL_3
+    ];
     this.attack_index = 0;
   }
 
   spiral_1_initializer()
   {
     this.attack_started = true;
-    this.spiral_1_time_end = 60*10;
+    this.spiral_1_time_end = 60*20;
 
     this.spiral_1_time_mod = 1;
     this.spiral_1_angle = random_float(0,2*Math.PI);
@@ -462,7 +446,7 @@ class Main_update_class
     }
 
     //only executes attack after a cretain amnt of time
-    if (this.timer>100){
+    if (this.timer>0){
       this.spiral_1_angle+=this.spiral_1_angle_incr;
       this.spiral_1_angle_acc+=this.spiral_1_angle_incr_acc;
 
@@ -501,11 +485,13 @@ class Main_update_class
     if (!this.attack_started){
       this.spiral_2_initializer();
     }
+    if (this.timer%(this.spiral_2_mod)==0)
+    {
+      this.spiral_2_angle+=this.spiral_2_angle_incr;
+    }
 
     if (this.timer%(difficulty*this.spiral_2_mod)==0)
     {
-      this.spiral_2_angle+=this.spiral_2_angle_incr;
-
       let temp_proj = new Projectile(15,this.spiral_2_color,width/2,height/2,
         this.spiral_2_speed*Math.cos(this.spiral_2_angle),this.spiral_2_speed*Math.sin(this.spiral_2_angle));
       
@@ -523,7 +509,7 @@ class Main_update_class
   spiral_3_initializer()
   {
     this.attack_started = true;
-    this.spiral_3_time_end = 60*10;
+    this.spiral_3_time_end = 60*20;
 
     this.spiral_3_angle = random_float(0,2*Math.PI);
     this.spiral_3_angle_incr = random_float(Math.PI/5,Math.PI/1.5);
@@ -538,10 +524,13 @@ class Main_update_class
       this.spiral_3_initializer();
     }
 
-    if (this.timer%(difficulty*this.spiral_3_mod)==0)
+    if (this.timer%(this.spiral_3_mod)==0)
     {
       this.spiral_3_angle+=this.spiral_3_angle_incr;
+    }
 
+    if (this.timer%(difficulty*this.spiral_3_mod)==0)
+    {
       let temp_proj = new Projectile(30,this.spiral_3_color,width/2,height/2,
         this.spiral_3_speed*Math.cos(this.spiral_3_angle),this.spiral_3_speed*Math.sin(this.spiral_3_angle),0,0.02);
       this.projectiles.push(temp_proj);
@@ -564,7 +553,7 @@ class Main_update_class
   spiral_4_initializer()
   {
     this.attack_started = true;
-    this.spiral_4_time_end = 60*10;
+    this.spiral_4_time_end = 60*20;
     
     this.spiral_4_angle_vel = 0;
     this.spiral_4_angle_acc = 0;
@@ -605,11 +594,10 @@ class Main_update_class
         this.spiral_4_color_incr[i] = -random_float(0.5,5);
       }
     }
+    this.spiral_4_angle_acc += this.spiral_4_angle_acc_add;
+    this.spiral_4_angle_vel += this.spiral_4_angle_vel_add;
     if (this.timer%difficulty == 0)
     {
-      this.spiral_4_angle_acc += this.spiral_4_angle_acc_add;
-      this.spiral_4_angle_vel += this.spiral_4_angle_vel_add;
-  
       let temp_proj = new Projectile(10,[this.spiral_4_color[0],this.spiral_4_color[1],this.spiral_4_color[2],70],width/2,height/2,
         this.spiral_4_vel*Math.cos(this.spiral_4_angle_vel),this.spiral_4_vel*Math.sin(this.spiral_4_angle_vel),
         this.spiral_4_acc*Math.cos(this.spiral_4_angle_acc)*Math.cos(this.spiral_4_angle_vel)
@@ -634,7 +622,13 @@ class Main_update_class
 
     this.example_attack_time_end = 60*10;
 
-    this.example_attack_angle = 0;
+    this.example_attack_angle = random_float(0,2*Math.PI);
+    this.example_attack_angle_increment = random_float(0.01,0.02);
+
+    this.example_attack_num1 = random_float(2,6);
+    this.example_attack_num2 = random_float(2,6);
+    this.example_attack_num3 = random_float(2,6);
+    this.example_attack_num4 = random_float(2,6);
   }
 
   example_attack(difficulty)
@@ -644,18 +638,20 @@ class Main_update_class
       this.example_attack_initializer();
     }
 
-    this.example_attack_angle += Math.PI/2+0.01; 
+    this.example_attack_angle += Math.PI/2+this.example_attack_angle_increment; 
 
     if (this.timer%(difficulty*5) == 0)
     {
       let temp_proj = new Projectile(25,[255,0,0],width/2,height/2
-      ,3 * Math.cos(this.example_attack_angle),2 * Math.sin(this.example_attack_angle)
+      ,this.example_attack_num1 * Math.cos(this.example_attack_angle),
+      this.example_attack_num2 * Math.sin(this.example_attack_angle)
       ,0,0);
       
       this.projectiles.push(temp_proj);
 
       temp_proj = new Projectile(25,[255,0,0],width/2,height/2
-      ,4 * Math.cos(-this.example_attack_angle+0.4),6 * Math.sin(-this.example_attack_angle+0.4)
+      ,this.example_attack_num3 * Math.cos(-this.example_attack_angle+0.4),
+      this.example_attack_num4 * Math.sin(-this.example_attack_angle+0.4)
       ,0,0);
         
       this.projectiles.push(temp_proj);
@@ -842,6 +838,11 @@ global_timer_text_box.style.fontSize = "50px";
 
 function start_new_question()
 {
+  player.x_max = width;
+  player.x_min = 0;
+  player.y_max = height;
+  player.y_min = 0;
+
   global_timer = 0;
   global_current_qa_num = random_int(1,global_amount_qa)-1;
 
@@ -889,7 +890,7 @@ function start_new_question()
 start_new_question();
 
 //higher the number easier the difficulty
-let global_attack_difficulty = 1;
+let global_attack_difficulty = 3;
 //higher value is better
 let global_point_multiplier = 1;
 
@@ -914,41 +915,47 @@ function question_ended()
 
   if (player.pos_x>width/2)
   {
-    // player.x_min = width/2;
-    // player.x_max = width;
+    player.x_min = width/2;
+    player.x_max = width;
     global_player_ans+=1
   }
   else
   {
-    // player.x_min = 0;
-    // player.x_max = width/2;
+    player.x_min = 0;
+    player.x_max = width/2;
   }
 
   if (player.pos_y>height/2)
   {
-    // player.y_min = height/2;
-    // player.y_max = height;
+    player.y_min = height/2;
+    player.y_max = height;
     global_player_ans+=2
   }
   else
   {
-    // player.y_min = 0;
-    // player.y_max = height/2;
+    player.y_min = 0;
+    player.y_max = height/2;
   }
   
   if (global_player_ans == global_location_correct_ans)
   {
-    global_attack_difficulty = random_int(2,4);
+    global_attack_difficulty = 3;
     global_point_multiplier = 5;
   }
   else
   {
-    global_attack_difficulty = 1;
+    global_attack_difficulty = 3; 
     global_point_multiplier = 1;
   }
 
 }
 
+
+//fuck this code is so cancerous
+let global_angle = 0;
+let global_angle_increment = 0.03;
+let global_speed = 5;
+let global_radius = 40;
 
 
 function update_main_loop(){
@@ -961,8 +968,42 @@ function update_main_loop(){
   {
     question_ended();
   }
+
   if (global_timer> global_time_wait[global_current_qa_num])
   {
+    if (global_timer%85==0)
+    {
+      global_angle += global_angle_increment
+      for (let i = 0; i < 12; i++)
+      {
+        let temp_angle = global_angle+i*Math.PI/6;
+        
+        let temp_proj = new Projectile(global_radius,[30,30,30,70],width/2,height/2,
+        global_speed * Math.cos(temp_angle),global_speed * Math.sin(temp_angle))
+
+        temp_proj.move();
+
+        let temp_num = 0;
+
+        if (temp_proj.pos_x>width/2)
+        {
+          temp_num+=1
+        }
+        if (temp_proj.pos_y>height/2)
+        {
+          temp_num+=2
+        }
+
+        if (temp_num != global_location_correct_ans)
+        {
+          console.log('SUCCESS')
+          main_update_object.projectiles.push(temp_proj);
+        }
+
+      }
+    }
+
+
     let should_end_attack = main_update_object.update_main(global_attack_difficulty);
     if (should_end_attack)
     {
@@ -981,6 +1022,8 @@ function update_main_loop(){
       }
   
       global_timer_text_box.innerHTML = Math.floor(global_score)+"";
+
+
     }
 
 
