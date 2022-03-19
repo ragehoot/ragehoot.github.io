@@ -3,52 +3,68 @@ const myQuizId = localStorage.getItem("quizId");
 const myRoomCode = Math.floor(100000 + Math.random() * 900000);
 
 // CHANGE LATER IF SWITCHING SERVER
-const BASE_SERVER_URL = "http://ragehoot.ydns.eu";
+//const BASE_SERVER_URL = "http://ragehoot.ydns.eu";
 
 let globalChannel;
 let gameRoomChannel;
 let global_player_arr;
 let totalPlayers;
 
+const socket = io();
+
 // connect to Ably
-const realtime = Ably.Realtime({
-    authUrl: BASE_SERVER_URL + "/auth",
-});
+// const realtime = Ably.Realtime({
+//     authUrl: BASE_SERVER_URL + "/auth",
+// });
 
-realtime.connection.once("connected", () => {
-    globalChannel = realtime.channels.get(globalGameName);
-    gameRoomChannel = realtime.channels.get(myRoomCode + ":primary");
+// realtime.connection.once("connected", () => {
+//     globalChannel = realtime.channels.get(globalGameName);
+//     gameRoomChannel = realtime.channels.get(myRoomCode + ":primary");
 
-    globalChannel.presence.enter({
-        quizId: myQuizId,
-        roomCode: myRoomCode
-    });
+//     globalChannel.presence.enter({
+//         quizId: myQuizId,
+//         roomCode: myRoomCode
+//     });
 
-    // load new game state
-    gameRoomChannel.subscribe("game-state", (msg) => {
-        global_player_arr = msg.data.playerList;
-        totalPlayers = msg.data.playerCount;
-    });
+//     // load new game state
+//     gameRoomChannel.subscribe("game-state", (msg) => {
+//         global_player_arr = msg.data.playerList;
+//         totalPlayers = msg.data.playerCount;
+//     });
 
-    // load new question
-    // gameRoomChannel.subscribe("question", (msg) => {
+//     // load new question
+//     // gameRoomChannel.subscribe("question", (msg) => {
 
-    // });
+//     // });
 
-    // game end
-    gameRoomChannel.subscribe("game-end", (msg) => {
+//     // game end
+//     gameRoomChannel.subscribe("game-end", (msg) => {
 
-    });
+//     });
 
-    document.getElementById("code").innerText += " " + myRoomCode;
-});
+//     document.getElementById("code").innerText += " " + myRoomCode;
+// });
 
 let gameInterval;
 let startButton = document.getElementById("start-button");
 
+socket.emit("new-room", {
+    gameCode: myRoomCode
+});
+
+document.getElementById("code").innerText += " " + myRoomCode;
+
+socket.on("game-state:" + myRoomCode, (data) => {
+    global_player_arr = data.players;
+    totalPlayers = data.playerCount;
+});
+
 startButton.addEventListener("click", function() {
-    gameRoomChannel.publish("start", {
-        start: true
+    // gameRoomChannel.publish("start", {
+    //     start: true
+    // });
+    socket.emit("start", {
+        gameCode: myRoomCode
     });
     startButton.remove();
     gameInterval = setInterval(scoreboardUpdate, 1000);

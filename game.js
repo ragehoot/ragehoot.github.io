@@ -10,13 +10,23 @@ let gameRoomChannel;
 
 const myNickname = localStorage.getItem("nickname");
 const roomCode = localStorage.getItem("roomCode");
+const socket = io();
 
 // connect to Ably
-const realtime = Ably.Realtime(
-{
-  authUrl: BASE_SERVER_URL + "/auth",
-});
+// const realtime = Ably.Realtime(
+// {
+//   authUrl: BASE_SERVER_URL + "/auth",
+// });
 
+// can change uniqueId func later if necessary
+// maybe should be done server side?
+const uniqueId = function() {
+    return "id-" + Math.random().toString(36).substr(2, 16);
+}
+
+//should probably change this
+const myId = uniqueId();
+myClientId = myId;
 
 let global_rand_arr = []; 
 
@@ -35,46 +45,60 @@ let global_player_arr;
 
 let global_rand_arr_index = 0;
 
-realtime.connection.once("connected", () => 
-{
-  myClientId = realtime.auth.clientId;
-  //gameRoom = realtime.channels.get("game-room");
-  //myChannel = realtime.channels.get("clientChannel-" + myClientId);
-  gameRoomChannel = realtime.channels.get(roomCode + ":primary");
-  gameRoomChannel.presence.enter({nickname: myNickname});
-
-  gameRoomChannel.subscribe("random-arr", (msg) => 
-  {
-    global_rand_arr = msg.data.randomArr;
-    global_continue_waiting_for_start_really_long_variable_name_hello_future_viewers = false;
-    start_new_question();
-  });
-  
-  /* removed because sending random arr signals start
-  // wait for game to start
-  gameRoomChannel.subscribe("start", (msg) => 
-  {
-    console.log("starting game");
-  });*/
-
-  // update game data
-  gameRoomChannel.subscribe("game-state", (msg) => 
-  {
-    global_player_arr = msg.data.playerList;
-  });
-
-  // load new question
-  gameRoomChannel.subscribe("question", (msg) => 
-  {
-
-  });
-
-  // game end
-  gameRoomChannel.subscribe("game-end", (msg) =>
-  {
-
-  });
+socket.emit("new-player", {
+  gameCode: roomCode
 });
+
+socket.on("game-state:"+ roomCode, (data) => {
+  global_player_arr = data.players;
+});
+
+socket.on("random-arr:" + roomCode, (data) => {
+  global_rand_arr = data.randArr;
+  global_continue_waiting_for_start_really_long_variable_name_hello_future_viewers = false;
+  start_new_question();
+});
+
+// realtime.connection.once("connected", () => 
+// {
+//   myClientId = realtime.auth.clientId;
+//   //gameRoom = realtime.channels.get("game-room");
+//   //myChannel = realtime.channels.get("clientChannel-" + myClientId);
+//   gameRoomChannel = realtime.channels.get(roomCode + ":primary");
+//   gameRoomChannel.presence.enter({nickname: myNickname});
+
+//   gameRoomChannel.subscribe("random-arr", (msg) => 
+//   {
+//     global_rand_arr = msg.data.randomArr;
+//     global_continue_waiting_for_start_really_long_variable_name_hello_future_viewers = false;
+//     start_new_question();
+//   });
+  
+//   /* removed because sending random arr signals start
+//   // wait for game to start
+//   gameRoomChannel.subscribe("start", (msg) => 
+//   {
+//     console.log("starting game");
+//   });*/
+
+//   // update game data
+//   gameRoomChannel.subscribe("game-state", (msg) => 
+//   {
+//     global_player_arr = msg.data.playerList;
+//   });
+
+//   // load new question
+//   gameRoomChannel.subscribe("question", (msg) => 
+//   {
+
+//   });
+
+//   // game end
+//   gameRoomChannel.subscribe("game-end", (msg) =>
+//   {
+
+//   });
+// });
 
 const width = screen.availWidth-300;
 const height = screen.availHeight;
@@ -1205,7 +1229,7 @@ function update_main_loop()
 
   } 
   // publish position
-  if (global_global_timer_never_reset > 60 && global_global_timer_never_reset % 60 == 1) 
+  if (global_global_timer_never_reset > 60 && global_global_timer_never_reset % 2 == 1) 
   {
     publish_position();
   }
@@ -1240,13 +1264,24 @@ function update_main_loop()
 
 function publish_position()
 {
-  gameRoomChannel.publish("player-data", 
-  {
-    x: Math.floor(player.pos_x),
-    y: Math.floor(player.pos_y),
-    score: Math.floor(global_score),
-    iframes: player.current_immunity_frames
-  }); // player.current_immunity_frames
+  // gameRoomChannel.publish("player-data", 
+  // {
+  //   x: Math.floor(player.pos_x),
+  //   y: Math.floor(player.pos_y),
+  //   score: Math.floor(global_score),
+  //   iframes: player.current_immunity_frames
+  // }); // player.current_immunity_frames
+  socket.emit("player-state", {
+    clientId: myId,
+    gameCode: roomCode,
+    player: {
+      x: Math.floor(player.pos_x),
+      y: Math.floor(player.pos_y),
+      score: Math.floor(global_score),
+      iframes: player.current_immunity_frames,
+      nickname: myNickname
+    }
+  })
 }  
 
 setInterval(update_main_loop,1000/60);
