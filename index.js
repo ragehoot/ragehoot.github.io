@@ -1,13 +1,16 @@
 document.getElementById("start-button").addEventListener("click", function() {
     localStorage.clear();
+    let quizId = 0;
+    localStorage.setItem("quizId", quizId);
     window.location.href = "/host";
 });
 
 document.getElementById("join-button").addEventListener("click", function() {
     localStorage.clear();
     let gameCode = document.getElementById("game-code").value;
+    gameCode = parseInt(gameCode);
     let nickname = document.getElementById("nickname").value;
-    localStorage.setItem("roomCode", roomCode);
+    localStorage.setItem("roomCode", gameCode);
     localStorage.setItem("nickname", nickname);
     window.location.href = "/game?roomCode=" + gameCode;
 });

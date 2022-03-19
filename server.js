@@ -17,8 +17,6 @@ const globalGameName = "main-game-thread";
 let globalChannel;
 
 let rooms = {};
-// increment id for every new room
-let roomId = 0;
 
 // can change uniqueId func later if necessary
 const uniqueId = function() {
@@ -31,6 +29,16 @@ const realtime = Ably.Realtime({
     echoMessages: false,
 });
 console.log("connected to Ably");
+
+// wait until connection with Ably is established
+realtime.connection.once("connected", () => {
+    globalChannel = realtime.channels.get(globalGameName);
+    // subscribe to new rooms being created
+    globalChannel.presence.subscribe("enter", (roomInfo) => {
+        console.log(roomInfo);
+        generateNewGameThread(roomInfo.data.quizId, roomInfo.data.roomCode);
+    });
+});
 
 app.use(express.static(__dirname));
 
@@ -65,36 +73,30 @@ app.get("/quizselect", (request, response) => {
 
 app.get("/game", (request, response) => {
     let requestedRoom = request.query.roomCode;
-    if (rooms[requestedRoom] || requestedRoom==1) {
+    console.log(requestedRoom);
+    if (rooms[requestedRoom]) {
         response.sendFile(__dirname + "/game.html");
     } else {
         response.sendFile(__dirname + "/index.html");
     }
 });
 
-app.get("/create", (request, response) => {
-    generateNewGameThread(request);
+app.get("/host", (request, response) => {
+    //generateNewGameThread(request.query.quizId);
+    response.sendFile(__dirname + "/host.html");
 });
 
 const listener = app.listen(PORT, () => {
     console.log("Listening on port " + listener.address().port);
 });
 
-// wait until connection with Ably is established
-realtime.connection.once("connected", () => {
-    globalChannel = realtime.channels.get(globalGameName);
-    // subscribe to new players entering the game
-    globalChannel.presence.subscribe("new-room", (room) => {
-       generateNewGameThread(room.quizId);
-    });
-});
 
 // create new game threads for each room
-function generateNewGameThread(quizId) {
-    if (isHost && isMainThread) {
+function generateNewGameThread(quizId, newRoomCode) {
+    if (isMainThread) {
         const worker = new Worker("./worker.js", {
             workerData: {
-                roomCode: roomId++,
+                roomCode: newRoomCode,
                 quizId: quizId
             },
         });
@@ -102,18 +104,26 @@ function generateNewGameThread(quizId) {
         worker.on("error", (error) => {
             console.log(`WORKER EXITED DUE TO AN ERROR ${error}`);
         });
+        rooms[newRoomCode] = {
+            roomCode: newRoomCode,
+            started: false
+        };
+        console.log("new room created with code: " + newRoomCode);
+        //console.log(rooms);
         worker.on("message", (msg) => {
-            if (msg.roomCode && !msg.resetEntry) {
-                rooms[msg.roomCode] = {
-                    roomCode: msg.roomCode,
-                    totalPlayers: msg.totalPlayers,
-                    gameOn: msg.gameOn
-                };
-            } else if (msg.roomCode && msg.resetEntry) {
-                delete rooms[msg.roomCode];
-            }
+            // if (msg.roomCode && !msg.resetEntry) {
+            //     rooms[msg.roomCode] = {
+            //         roomCode: msg.roomCode,
+            //         totalPlayers: msg.totalPlayers,
+            //         gameOn: msg.gameOn
+            //     };
+            // } else if (msg.roomCode && msg.resetEntry) {
+            //     delete rooms[msg.roomCode];
+            // }
         });
         worker.on("exit", (code) => {
+            delete rooms[newRoomCode];
+            console.log("deleted room: " + newRoomCode);
             console.log(`WORKER EXITED WITH THREAD ID ${threadId}`);
             if (code !== 0) {
                 console.log(`WORKER EXITED DUE TO AN ERROR WITH CODE ${code}`);
