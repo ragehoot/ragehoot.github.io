@@ -17,6 +17,20 @@ const realtime = Ably.Realtime(
   authUrl: BASE_SERVER_URL + "/auth",
 });
 
+
+let global_rand_arr; 
+
+/*
+global_player_arr = {
+  123123: {id:123, x:123, y:123, score:123, nickname:123, iframes:123},
+  123123: {id:123, x:123, y:123, score:123, nickname:123, iframes:123},
+  123123: {id:123, x:123, y:123, score:123, nickname:123, iframes:123}
+};
+*/
+let global_player_arr;
+
+let global_rand_arr_index = 0;
+
 realtime.connection.once("connected", () => 
 {
   myClientId = realtime.auth.clientId;
@@ -25,17 +39,23 @@ realtime.connection.once("connected", () =>
   gameRoomChannel = realtime.channels.get(roomCode + ":primary");
   gameRoomChannel.presence.enter({nickname: myNickname});
 
-
+  gameRoomChannel.subscribe("random-arr", (msg) => 
+  {
+    global_rand_arr = msg.data.randomArr;
+    global_continue_waiting_for_start_really_long_variable_name_hello_future_viewers = false;
+  });
+  
+  /* removed because sending random arr signals start
   // wait for game to start
   gameRoomChannel.subscribe("start", (msg) => 
   {
     console.log("starting game");
-  });
+  });*/
 
   // update game data
   gameRoomChannel.subscribe("game-state", (msg) => 
   {
-
+    global_player_arr = msg.data.playerList;
   });
 
   // load new question
@@ -390,17 +410,21 @@ function draw_line(x1,y1,x2,y2,color)
 
 //https://stackoverflow.com/questions/1527803/generating-random-whole-numbers-in-javascript-in-a-specific-range
 /** the min must be lower than the max */
+
+//global_rand_arr = [Math.random(),Math.random(),Math.random(),Math.random()];
 function random_int(min, max) 
 {
   min = Math.ceil(min);
   max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  global_rand_arr_index = (global_rand_arr_index+1)%global_rand_arr.length;
+  return Math.floor(global_rand_arr[global_rand_arr_index] * (max - min + 1)) + min;
 }
 
 /**min doesn't have to be lower than the max */
 function random_float(min,max)
 {
-  return (Math.random()*(max-min)+min);
+  global_rand_arr_index = (global_rand_arr_index+1)%global_rand_arr.length;
+  return (global_rand_arr[global_rand_arr_index]*(max-min)+min);
 }
 
 function random_choice(arr_choices)
@@ -938,17 +962,6 @@ function start_new_question()
     answer_boxes[i].innerHTML = temp_text;
     answer_boxes[i].style.fontSize = 150 / Math.sqrt(temp_text.length) + "px";
     answer_boxes[i].style.backgroundColor = "rgba(255,220,220)";
-    /**for (let i = 0; i<4; i++)
-    {
-      if (global_current_answers[i] !=0)
-      {
-        answer_boxes[i].style.backgroundColor = "red";
-      }
-      else
-      {
-        answer_boxes[i].style.backgroundColor = "green";
-      }
-    } */
   }
 }
 
@@ -1016,87 +1029,134 @@ function question_ended()
 }
 
 
-//fuck this code is so cancerous
+//this code is no bueno
 let global_angle = 0;
 let global_angle_increment = 0.03;
 let global_speed = 5;
 let global_radius = 40;
 
+background(255,255,255);
 
+let global_global_timer_never_reset = 0;
 function update_main_loop(){
-  background(255,255,255);
-
-  global_timer+=1;
-
-  //console.log(downPressedKeys);
-  if (global_timer == global_time_wait[global_current_qa_num])
+  if (!global_continue_waiting_for_start_really_long_variable_name_hello_future_viewers)
   {
-    question_ended();
-  }
+    background(255,255,255);
+    global_global_timer_never_reset+=1;
 
-  if (global_timer> global_time_wait[global_current_qa_num])
-  {
-    if (global_timer%85==0)
+    global_timer+=1;
+
+    //console.log(downPressedKeys);
+    if (global_timer == global_time_wait[global_current_qa_num])
     {
-      global_angle += global_angle_increment
-      for (let i = 0; i < 12; i++)
+      question_ended();
+    }
+
+    if (global_timer> global_time_wait[global_current_qa_num])
+    {
+      if (global_timer%85==0)
       {
-        let temp_angle = global_angle+i*Math.PI/6;
-        
-        let temp_proj = new Projectile(global_radius,[30,30,30,70],width/2,height/2,
-        global_speed * Math.cos(temp_angle),global_speed * Math.sin(temp_angle))
-
-        temp_proj.move();
-
-        let temp_num = 0;
-
-        if (temp_proj.pos_x>width/2)
+        global_angle += global_angle_increment
+        for (let i = 0; i < 12; i++)
         {
-          temp_num+=1
-        }
-        if (temp_proj.pos_y>height/2)
-        {
-          temp_num+=2
-        }
+          let temp_angle = global_angle+i*Math.PI/6;
+          
+          let temp_proj = new Projectile(global_radius,[30,30,30,70],width/2,height/2,
+          global_speed * Math.cos(temp_angle),global_speed * Math.sin(temp_angle))
 
-        if (temp_num != global_location_correct_ans)
-        {
-          console.log('SUCCESS')
-          main_update_object.projectiles.push(temp_proj);
-        }
+          temp_proj.move();
 
+          let temp_num = 0;
+
+          if (temp_proj.pos_x>width/2)
+          {
+            temp_num+=1
+          }
+          if (temp_proj.pos_y>height/2)
+          {
+            temp_num+=2
+          }
+
+          if (temp_num != global_location_correct_ans)
+          {
+            main_update_object.projectiles.push(temp_proj);
+          }
+
+        }
       }
-    }
 
 
-    let should_end_attack = main_update_object.update_main(global_attack_difficulty);
-    if (should_end_attack)
-    {
-      start_new_question();
-    }
-    else
-    {
-      if (player.immunity())
+      let should_end_attack = main_update_object.update_main(global_attack_difficulty);
+      if (should_end_attack)
       {
-        global_score+=Math.log(player.current_immunity_frames)*global_point_multiplier/20;
-        global_timer_text_box.style.color = "black";
+        start_new_question();
       }
       else
       {
-        global_score -= (5/Math.sqrt(global_point_multiplier));
-        global_timer_text_box.style.color = "red";
+        if (player.immunity())
+        {
+          global_score+=Math.log(player.current_immunity_frames)*global_point_multiplier/20;
+          global_timer_text_box.style.color = "black";
+        }
+        else
+        {
+          global_score -= (5/Math.sqrt(global_point_multiplier));
+          global_timer_text_box.style.color = "red";
+        }
+    
+        global_timer_text_box.innerHTML = Math.floor(global_score)+"";
+
+
       }
-  
-      global_timer_text_box.innerHTML = Math.floor(global_score)+"";
-
-
     }
-  }
 
+    draw_line(0,height/2,width,height/2,[0,0,0]);
+    draw_line(width/2,0,width/2,height,[0,0,0]);
+
+    for (const p_id in global_player_arr) {
+
+      let curPlayer = global_player_arr[p_id];
+
+      let temp_pos_x = curPlayer.x; 
+      let temp_pos_y = curPlayer.y;
+      let temp_current_immunity_frames = curPlayer.iframes; 
+      let temp_color;
+      if (temp_current_immunity_frames > this.total_immunity_frames)
+      {
+        temp_color = [0,255,0];
+      }
+      else
+      {
+        temp_color = [255,0,0];
+      }
+      draw_circle(temp_pos_x,temp_pos_y,player.radius,temp_color,true,temp_color)
+    }
+
+    // publish position
+    if (global_global_timer_never_reset % 6 == 0) 
+    {
+      publish_position();
+    }
+  } 
   player.update();
-
-  draw_line(0,height/2,width,height/2,[0,0,0]);
-  draw_line(width/2,0,width/2,height,[0,0,0]);
 }
+
+// XY
+// .x
+// .y
+
+// pos = [x,y]
+
+function publish_position()
+{
+  gameRoomChannel.publish("player-data", 
+  {
+    x: player.pos_x,
+    y: player.pos_y,
+    score: global_score,
+    iframes: player.current_immunity_frames
+  }); // player.current_immunity_frames
+}  
+
 
 setInterval(update_main_loop,1000/60);
