@@ -7,6 +7,8 @@ const BASE_SERVER_URL = "http://ragehoot.ydns.eu";
 
 let globalChannel;
 let gameRoomChannel;
+let global_player_arr;
+let totalPlayers;
 
 // connect to Ably
 const realtime = Ably.Realtime({
@@ -24,22 +26,24 @@ realtime.connection.once("connected", () => {
 
     // load new game state
     gameRoomChannel.subscribe("game-state", (msg) => {
-
+        global_player_arr = msg.data.playerList;
+        totalPlayers = msg.data.playerCount;
     });
 
     // load new question
-    gameRoomChannel.subscribe("question", (msg) => {
+    // gameRoomChannel.subscribe("question", (msg) => {
 
-    });
+    // });
 
     // game end
     gameRoomChannel.subscribe("game-end", (msg) => {
 
     });
 
-    document.getElementById("code").innerText += myRoomCode;
+    document.getElementById("code").innerText += " " + myRoomCode;
 });
 
+let gameInterval;
 let startButton = document.getElementById("start-button");
 
 startButton.addEventListener("click", function() {
@@ -47,7 +51,33 @@ startButton.addEventListener("click", function() {
         start: true
     });
     startButton.remove();
+    gameInterval = setInterval(scoreboardUpdate, 1000);
 });
 
+// scoreboard update
+function scoreboardUpdate() {
+    let scores = [];
+    for (const p_id in global_player_arr) {
+        scores.push([global_player_arr[p_id].score, global_player_arr[p_id].nickname]);
+    }
+    scores.sort(function comp(a, b) {
+        let ai = parseInt(a);
+        let bi = parseInt(b);
+        if (ai == bi) return 0;
+        else if (ai < bi) return -1;
+        else return 1;
+    });
+    console.log(scores);
+    for (let i = 1; i <= 5; i++) {
+        if (i > totalPlayers) break;
+        let listItem = document.getElementById("li-" + i);
+        listItem.innerText = scores[totalPlayers-i][1] + ": " + scores[totalPlayers-i][0];
+    }
+}
+
+
+function gameEnd() {
+    clearInterval(gameInterval);
+}
 
 // TODO: draw game

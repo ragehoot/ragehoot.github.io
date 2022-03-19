@@ -18,7 +18,11 @@ const realtime = Ably.Realtime(
 });
 
 
-let global_rand_arr; 
+let global_rand_arr = []; 
+
+// for (let i = 0; i < 53; i++) {
+//   global_rand_arr.push(Math.random());
+// }
 
 /*
 global_player_arr = {
@@ -43,6 +47,7 @@ realtime.connection.once("connected", () =>
   {
     global_rand_arr = msg.data.randomArr;
     global_continue_waiting_for_start_really_long_variable_name_hello_future_viewers = false;
+    start_new_question();
   });
   
   /* removed because sending random arr signals start
@@ -301,7 +306,7 @@ class Player
       this.pos_x += temp_move_x * this.speed_slowed;
       this.pos_y += temp_move_y * this.speed_slowed;
     }
-    else if(downPressedMouse.has(undefined))
+    else if(downPressedKeys.has('h'))
     {
       this.pos_x += temp_move_x * this.speed_fast;
       this.pos_y += temp_move_y * this.speed_fast;
@@ -411,7 +416,6 @@ function draw_line(x1,y1,x2,y2,color)
 //https://stackoverflow.com/questions/1527803/generating-random-whole-numbers-in-javascript-in-a-specific-range
 /** the min must be lower than the max */
 
-global_rand_arr = [Math.random(),Math.random(),Math.random(),Math.random()];
 function random_int(min, max) 
 {
   min = Math.ceil(min);
@@ -454,15 +458,13 @@ class Main_update_class
     this.SPIRAL_3 = 4; // a more complex attack
     this.SPIRAL_4 = 5;
     this.KHELO_ATTACK = 6;
+    
+    this.UNIQUE_1 = 7;
+    
 
     this.ATTACK_INDEX_RETURN_TO = 0; // index in the array
 
-    this.attack_arr = [
-      this.SPIRAL_4,this.EXAMPLE_ATTACK,
-      this.SPIRAL_4,this.SPIRAL_2,
-      this.SPIRAL_4,this.SPIRAL_1,
-      this.SPIRAL_4,this.SPIRAL_3, 
-      this.SPIRAL_4,this.KHELO_ATTACK];
+    this.attack_arr = [this.SPIRAL_1,this.SPIRAL_2,this.SPIRAL_3,this.SPIRAL_4,this.EXAMPLE_ATTACK];
     this.attack_index = 0;
   }
 
@@ -470,6 +472,9 @@ class Main_update_class
   {
     this.attack_started = true;
     this.spiral_1_time_end = 60*20;
+
+    this.spiral_4_color = [random_int(0,255),random_int(0,255),random_int(0,255)];
+    this.spiral_4_color_incr = [random_float(0,1),random_float(0,1),random_float(0,1)];
 
     this.spiral_1_time_mod = 1;
     this.spiral_1_angle = random_float(0,2*Math.PI);
@@ -479,6 +484,8 @@ class Main_update_class
     this.spiral_1_angle_acc = random_float(0,2*Math.PI);
     this.spiral_1_angle_incr_acc = random_float(0.2,2*Math.PI);
     this.spiral_1_acc = random_float(0.05,0.1);
+
+    this.spiral_1_radius = random_int(7,13);
   }
 
   spiral_1(difficulty)
@@ -488,6 +495,21 @@ class Main_update_class
       this.spiral_1_initializer();
     }
 
+    for (let i = 0; i < 3; i++)
+    {
+      this.spiral_4_color[i] += this.spiral_4_color_incr[i];
+      if (this.spiral_4_color[i]<=0)
+      {
+        this.spiral_4_color[i] = 0;
+        this.spiral_4_color_incr[i] = random_float(0,1);
+      }
+      else if (this.spiral_4_color[i]>=255)
+      {
+        this.spiral_4_color[i] = 255;
+        this.spiral_4_color_incr[i] = -random_float(0,1);
+      }
+    }
+
     //only executes attack after a cretain amnt of time
     if (this.timer>0){
       this.spiral_1_angle+=this.spiral_1_angle_incr;
@@ -495,7 +517,7 @@ class Main_update_class
 
       if (this.timer%(difficulty*this.spiral_1_time_mod) == 0)
       {
-        let temp_proj = new Projectile(10,[255,0,0,170],width/2,height/2,
+        let temp_proj = new Projectile(this.spiral_1_radius,[this.spiral_4_color[0],this.spiral_4_color[1],this.spiral_4_color[2],170],width/2,height/2,
           Math.cos(this.spiral_1_angle)*this.spiral_1_speed,Math.sin(this.spiral_1_angle)*this.spiral_1_speed,
           Math.cos(this.spiral_1_angle_acc)*this.spiral_1_acc,Math.sin(this.spiral_1_angle_acc)*this.spiral_1_acc);
         this.projectiles.push(temp_proj);
@@ -514,7 +536,10 @@ class Main_update_class
   spiral_2_initializer()
   {
     this.attack_started = true;
-    this.spiral_2_time_end = 60*10;
+    this.spiral_2_time_end = 60*20;
+
+    this.spiral_4_color = [random_int(0,255),random_int(0,255),random_int(0,255)];
+    this.spiral_4_color_incr = [random_float(0,2),random_float(0,2),random_float(3,4)];
 
     this.spiral_2_angle = random_float(0,2*Math.PI);
     this.spiral_2_angle_incr = random_float(0.02,0.10)+2*Math.PI/random_int(3,10);
@@ -525,10 +550,25 @@ class Main_update_class
 
   spiral_2(difficulty)
   {
-    if (!this.attack_started)
-    {
+    if (!this.attack_started){
       this.spiral_2_initializer();
     }
+
+    for (let i = 0; i < 3; i++)
+    {
+      this.spiral_4_color[i] += this.spiral_4_color_incr[i];
+      if (this.spiral_4_color[i]<=0)
+      {
+        this.spiral_4_color[i] = 0;
+        this.spiral_4_color_incr[i] = random_float(0,2);
+      }
+      else if (this.spiral_4_color[i]>=255)
+      {
+        this.spiral_4_color[i] = 255;
+        this.spiral_4_color_incr[i] = -random_float(0,2);
+      }
+    }
+
     if (this.timer%(this.spiral_2_mod)==0)
     {
       this.spiral_2_angle+=this.spiral_2_angle_incr;
@@ -536,7 +576,7 @@ class Main_update_class
 
     if (this.timer%(difficulty*this.spiral_2_mod)==0)
     {
-      let temp_proj = new Projectile(15,this.spiral_2_color,width/2,height/2,
+      let temp_proj = new Projectile(10+10*(this.timer/this.spiral_2_time_end),[this.spiral_4_color[0],this.spiral_4_color[1],this.spiral_4_color[2],255],width/2,height/2,
         this.spiral_2_speed*Math.cos(this.spiral_2_angle),this.spiral_2_speed*Math.sin(this.spiral_2_angle));
       
       this.projectiles.push(temp_proj);
@@ -555,6 +595,9 @@ class Main_update_class
     this.attack_started = true;
     this.spiral_3_time_end = 60*20;
 
+    this.spiral_4_color = [random_int(0,255),random_int(0,255),random_int(0,255)];
+    this.spiral_4_color_incr = [random_float(0.2,0.5),random_float(0.2,0.5),random_float(0.2,0.5)];
+
     this.spiral_3_angle = random_float(0,2*Math.PI);
     this.spiral_3_angle_incr = random_float(Math.PI/5,Math.PI/1.5);
     this.spiral_3_mod = 6; // proejctiles generated every 2 frames (60 frames per second)
@@ -568,6 +611,21 @@ class Main_update_class
       this.spiral_3_initializer();
     }
 
+    for (let i = 0; i < 3; i++)
+    {
+      this.spiral_4_color[i] += this.spiral_4_color_incr[i];
+      if (this.spiral_4_color[i]<=0)
+      {
+        this.spiral_4_color[i] = 0;
+        this.spiral_4_color_incr[i] = random_float(0.2,0.5);
+      }
+      else if (this.spiral_4_color[i]>=60)
+      {
+        this.spiral_4_color[i] = 60;
+        this.spiral_4_color_incr[i] = -random_float(0.2,0.5);
+      }
+    }
+
     if (this.timer%(this.spiral_3_mod)==0)
     {
       this.spiral_3_angle+=this.spiral_3_angle_incr;
@@ -575,11 +633,11 @@ class Main_update_class
 
     if (this.timer%(difficulty*this.spiral_3_mod)==0)
     {
-      let temp_proj = new Projectile(30,this.spiral_3_color,width/2,height/2,
+      let temp_proj = new Projectile(30,[this.spiral_4_color[0],this.spiral_4_color[1],this.spiral_4_color[2],255],width/2,height/2,
         this.spiral_3_speed*Math.cos(this.spiral_3_angle),this.spiral_3_speed*Math.sin(this.spiral_3_angle),0,0.02);
       this.projectiles.push(temp_proj);
 
-      temp_proj = new Projectile(30,this.spiral_3_color,width/2,height/2,
+      temp_proj = new Projectile(30,[255-this.spiral_4_color[0],255-this.spiral_4_color[1],255-this.spiral_4_color[2],110],width/2,height/2,
         this.spiral_3_speed*Math.cos(this.spiral_3_angle),this.spiral_3_speed*Math.sin(this.spiral_3_angle),0,-0.02);
       
       this.projectiles.push(temp_proj);
@@ -615,6 +673,8 @@ class Main_update_class
     {
       this.spiral_4_acc = random_choice([-0.015,0.015]);
     }
+
+    this.spiral_4_radius = random_int(5,6);
   }
 
   spiral_4(difficulty)
@@ -642,7 +702,7 @@ class Main_update_class
     this.spiral_4_angle_vel += this.spiral_4_angle_vel_add;
     if (this.timer%difficulty == 0)
     {
-      let temp_proj = new Projectile(10,[this.spiral_4_color[0],this.spiral_4_color[1],this.spiral_4_color[2],70],width/2,height/2,
+      let temp_proj = new Projectile(this.spiral_4_radius+7*this.timer/this.spiral_4_time_end,[this.spiral_4_color[0],this.spiral_4_color[1],this.spiral_4_color[2],70],width/2,height/2,
         this.spiral_4_vel*Math.cos(this.spiral_4_angle_vel),this.spiral_4_vel*Math.sin(this.spiral_4_angle_vel),
         this.spiral_4_acc*Math.cos(this.spiral_4_angle_acc)*Math.cos(this.spiral_4_angle_vel)
         ,this.spiral_4_acc*Math.sin(this.spiral_4_angle_acc)*Math.sin(this.spiral_4_angle_vel))
@@ -659,54 +719,12 @@ class Main_update_class
     }
     return false;
   }
-  khelo_attack_intializer()
-  {
-    this.attack_started=true;
-   
-    this.khelo_attack_time_end = 100*20
- 
-    this.khelo_attack_time_end = 0;
-  }
- 
-  khelo_attack()
-  {
-    if (!this.attack_started)
-    {
-      this.khelo_attack_initializer();
-    }
- 
-    this.khelo_attack_angle += Math.PI/2+0.01;
- 
-    //player position
-    //player.pos_x
-    //player.pos_y
- 
-    // let temp_vel_x = -(width/2-player.pos_x);
-    // let temp_vel_y = -(height/2-player.pos_y);
-    // let temp_dist = distance(width/2,height/2,player.pos_x,player.pos_y);
-    // temp_vel_x/=temp_dist;
-    // temp_vel_y/=temp_dist;
- 
-    if (this.timer%3 == 0)
-    {
-      let temp_proj = new Projectile(25,[255,0,0],width/2,height/2
-      ,1,1
-      ,0,0);
-     
-      this.projectiles.push(temp_proj);
- 
-      temp_proj = new Projectile(25,[255,0,0],width/2,height/2
-      ,4 * Math.cos(-this.khelo_attack_angle+0.4),6 * Math.sin(-this.khelo_attack_angle+0.4)
-      ,0,0);
-       
-      this.projectiles.push(temp_proj);
-    }
-  }
+
   example_attack_initializer()
   {
     this.attack_started = true;
 
-    this.example_attack_time_end = 60*10;
+    this.example_attack_time_end = 60*20;
 
     this.example_attack_angle = random_float(0,2*Math.PI);
     this.example_attack_angle_increment = random_float(0.01,0.02);
@@ -715,6 +733,8 @@ class Main_update_class
     this.example_attack_num2 = random_float(2,6);
     this.example_attack_num3 = random_float(2,6);
     this.example_attack_num4 = random_float(2,6);
+
+    this.example_attack_radius = random_int(20,30);
   }
 
   example_attack(difficulty)
@@ -728,14 +748,14 @@ class Main_update_class
 
     if (this.timer%(difficulty*5) == 0)
     {
-      let temp_proj = new Projectile(25,[255,0,0],width/2,height/2
+      let temp_proj = new Projectile(this.radius,[255,0,0,255-254*this.timer/this.example_attack_time_end],width/2,height/2
       ,this.example_attack_num1 * Math.cos(this.example_attack_angle),
       this.example_attack_num2 * Math.sin(this.example_attack_angle)
       ,0,0);
       
       this.projectiles.push(temp_proj);
 
-      temp_proj = new Projectile(25,[255,0,0],width/2,height/2
+      temp_proj = new Projectile((30-this.example_attack_radius)+20,[255,0,0,255-254*this.timer/this.example_attack_time_end],width/2,height/2
       ,this.example_attack_num3 * Math.cos(-this.example_attack_angle+0.4),
       this.example_attack_num4 * Math.sin(-this.example_attack_angle+0.4)
       ,0,0);
@@ -753,6 +773,75 @@ class Main_update_class
     return false; // attack still going on
   }
 
+  khelo_attack_initializer()
+  {
+    this.attack_started=true;
+   
+    this.khelo_attack_time_end = 10*60;
+ 
+    this.khelo_attack_angle = 0;
+  }
+
+  khelo_attack(difficulty)
+  {
+    if (!this.attack_started)
+    {
+      this.khelo_attack_initializer();
+    }
+ 
+    this.khelo_attack_angle += Math.PI/2+0.01;
+ 
+    if (this.timer%3 == 0)
+    {
+      let temp_proj = new Projectile(25,[255,0,0],width/2,height/2
+      ,1,1
+      ,0,0);
+     
+      this.projectiles.push(temp_proj);
+ 
+      temp_proj = new Projectile(25,[255,0,0],width/2,height/2
+      ,4 * Math.cos(-this.khelo_attack_angle+0.4),6 * Math.sin(-this.khelo_attack_angle+0.4)
+      ,0,0);
+       
+      this.projectiles.push(temp_proj);
+    }
+    this.projetiles = Projectile.update_list(this.projectiles);
+    if (this.timer > this.khelo_attack_time_end)
+    {
+      return true;
+    }
+
+    return false;
+  }
+
+  unique_1_initializer()
+  {
+    this.attack_started=true;
+   
+    this.unique_1_time_end = 20*60;
+  }
+
+  unique_1(difficulty)
+  {
+    if (!this.attack_started)
+    {
+      this.unique_1_initializer();
+    }
+
+    if (this.timer%difficulty == 0)
+    {
+
+    }
+
+    if (this.timer>this.unique_1_time_end)
+    {
+      return true;
+    }
+    return false
+  }
+
+
+  
   /** higher difficulty number = less projectiles */
   update_main(difficulty)
   {
@@ -784,9 +873,12 @@ class Main_update_class
           break
 
         case this.KHELO_ATTACK:
-          finished_attack = this.khelo_attack();
-          break
-
+          finished_attack = this.khelo_attack(difficulty);
+          break;
+        
+        case UNIQUE_1:
+          finished_attack = this.unique_1(difficulty);
+          break;
         default:
           console.log('out of attack arr bounds');
       }
@@ -795,6 +887,7 @@ class Main_update_class
 
       if (finished_attack)
       {
+        console.log(this.attack_index);
         this.attack_index +=1;
         this.attack_started = false;
 
@@ -841,7 +934,7 @@ let global_answers = [
 ]
 
 //make sure its in 60 fps -- > value of 120 would be 2 seconds
-let global_time_wait = [320,320,320,320,320,320,320,320,320,320];
+let global_time_wait = 320;
 
 let question_box = document.createElement('div');
 question_box.style.position = "absolute";
@@ -965,8 +1058,6 @@ function start_new_question()
   }
 }
 
-start_new_question();
-
 //higher the number easier the difficulty
 let global_attack_difficulty = 3;
 //higher value is better
@@ -1035,24 +1126,25 @@ let global_angle_increment = 0.03;
 let global_speed = 5;
 let global_radius = 40;
 
-background(255,255,255);
+//background(255,255,255);
 
 let global_global_timer_never_reset = 0;
-function update_main_loop(){
+function update_main_loop()
+{
+  global_global_timer_never_reset+=1;
   if (!global_continue_waiting_for_start_really_long_variable_name_hello_future_viewers)
   {
     background(255,255,255);
-    global_global_timer_never_reset+=1;
 
     global_timer+=1;
 
     //console.log(downPressedKeys);
-    if (global_timer == global_time_wait[global_current_qa_num])
+    if (global_timer == global_time_wait)
     {
       question_ended();
     }
 
-    if (global_timer> global_time_wait[global_current_qa_num])
+    if (global_timer> global_time_wait)
     {
       if (global_timer%85==0)
       {
@@ -1110,31 +1202,31 @@ function update_main_loop(){
       }
     }
 
-    for (const p_id in global_player_arr) {
 
-      let curPlayer = global_player_arr[p_id];
-
-      let temp_pos_x = curPlayer.x; 
-      let temp_pos_y = curPlayer.y;
-      let temp_current_immunity_frames = curPlayer.iframes; 
-      let temp_color;
-      if (temp_current_immunity_frames > this.total_immunity_frames)
-      {
-        temp_color = [0,255,0];
-      }
-      else
-      {
-        temp_color = [255,0,0];
-      }
-      draw_circle(temp_pos_x,temp_pos_y,player.radius,temp_color,true,temp_color)
-    }
-
-    // publish position
-    if (global_global_timer_never_reset % 6 == 0) 
-    {
-      publish_position();
-    }
   } 
+  // publish position
+  if (global_global_timer_never_reset > 60 && global_global_timer_never_reset % 60 == 1) 
+  {
+    publish_position();
+  }
+  for (const p_id in global_player_arr) {
+    if (p_id == myClientId) continue;
+    let curPlayer = global_player_arr[p_id];
+
+    let temp_pos_x = curPlayer.x; 
+    let temp_pos_y = curPlayer.y;
+    let temp_current_immunity_frames = curPlayer.iframes; 
+    let temp_color;
+    if (temp_current_immunity_frames > this.total_immunity_frames)
+    {
+      temp_color = [255,0,0];
+    }
+    else
+    {
+      temp_color = [0,255,0];
+    }
+    draw_circle(temp_pos_x,temp_pos_y,player.radius,temp_color,true,temp_color)
+  }
   player.update();
   draw_line(0,height/2,width,height/2,[0,0,0]);
   draw_line(width/2,0,width/2,height,[0,0,0]);
@@ -1150,12 +1242,11 @@ function publish_position()
 {
   gameRoomChannel.publish("player-data", 
   {
-    x: player.pos_x,
-    y: player.pos_y,
-    score: global_score,
+    x: Math.floor(player.pos_x),
+    y: Math.floor(player.pos_y),
+    score: Math.floor(global_score),
     iframes: player.current_immunity_frames
   }); // player.current_immunity_frames
 }  
-
 
 setInterval(update_main_loop,1000/60);
