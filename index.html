@@ -28,19 +28,25 @@
                 <hr class="my-4">
                 <div class="row">
                 <p class="col-6">
-                  <a class="btn btn-primary btn-lg" href="quizselect.html" role="button">Quiz Select</a>
+                  <textarea id="game-code" placeholder="Code"></textarea>
+                  <textarea id="nickname" placeholder="Nickname"></textarea>
                   <div class="col-6">
                   <a class="btn btn-primary btn-lg" href="quizmaker.html" role="button">Quiz Maker</a>
                   </div>
-                  </div>
+                </div>
                 </p>
               </div>
             </div>
-
-            <button id="start-button">Create Game!</button>
-            <textarea id="game-code">Code</textarea>
-            <textarea id="nickname">Nickname</textarea>
-            <button id="join-button">Join Game!</button>
-            <button id="singleplayer-button">Singleplayer!</button>
+              <div class="row text-center">
+                <div class="col-4">
+            <button class="btn btn-primary btn-lg" id="start-button">Create Game!</button>
+            </div>
+            <div class="col-4">
+            <button id="join-button" class="btn btn-primary btn-lg btn-outline-success">Join Game!</button>
+            </div>
+            <div class="col-4">
+            <button id="singleplayer-button"class="btn btn-primary btn-lg">Singleplayer!</button>
+            </div>
+            </div>
          </body>
  </html>
