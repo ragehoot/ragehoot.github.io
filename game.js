@@ -1085,7 +1085,7 @@ let global_attack_difficulty = 3;
 let global_point_multiplier = 1;
 
 let global_player_ans;
-let global_score = 0;
+let global_score = 0; 
 
 function question_ended()
 {
