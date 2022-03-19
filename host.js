@@ -6,6 +6,7 @@ const myRoomCode = Math.floor(100000 + Math.random() * 900000);
 const BASE_SERVER_URL = "http://ragehoot.ydns.eu";
 
 let globalChannel;
+let gameRoomChannel;
 
 // connect to Ably
 const realtime = Ably.Realtime({
@@ -14,12 +15,21 @@ const realtime = Ably.Realtime({
 
 realtime.connection.once("connected", () => {
     globalChannel = realtime.channels.get(globalGameName);
+    gameRoomChannel = realtime.channels.get(roomCode + ":primary");
 
     globalChannel.presence.enter({
         quizId: myQuizId,
         roomCode: myRoomCode
     });
 
+    gameRoomChannel.subscribe("game-state", (data) => {
+
+    });
+
     document.getElementById("code").innerText += myRoomCode;
 });
 
+
+document.getElementById("start-button").addEventListener("click", function() {
+    gameRoomChannel.publish("start");
+});

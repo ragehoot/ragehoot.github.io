@@ -14,7 +14,7 @@ const TICK_MS = 100;
 
 let players = {};
 let totalPlayers = 0;
-let gameRoom;
+let gameRoomChannel;
 let gameCode = workerData.roomCode;
 
 // instantiate to Ably
@@ -24,16 +24,29 @@ const realtime = Ably.Realtime({
 });
 // wait until connection with Ably is established
 realtime.connection.once("connected", () => {
-    gameRoom = realtime.channels.get(gameCode + ":primary");
+    gameRoomChannel = realtime.channels.get(gameCode + ":primary");
   
     // subscribe to new players entering the game
-    gameRoom.presence.subscribe("enter", (player) => {
+    gameRoomChannel.presence.subscribe("enter", (player) => {
         console.log(gameCode + ": new player");
+        let newPlayerId = player.clientId;
+        players[newPlayerId] = {
+            id: newPlayerId,
+            x: 0,
+            y: 0,
+            score: 0,
+            nickname: player.data.nickname,
+        };
     });
   
     // subscribe to players leaving the game
-    gameRoom.presence.subscribe("leave", (player) => {
+    gameRoomChannel.presence.subscribe("leave", (player) => {
         
+    });
+
+    // wait for game to start
+    gameRoomChannel.subscribe("start", {
+        startGame();
     });
 });
 
@@ -41,8 +54,7 @@ realtime.connection.once("connected", () => {
 // starts the game
 const startGame = function() {
     let tickInterval = setInterval(() => {
-        // TODO: Differentiate between active game and scoreboard
-        gameRoom.publish("game-state", {
+        gameRoomChannel.publish("game-state", {
             players: players,
             playerCount: totalPlayers,
         });
