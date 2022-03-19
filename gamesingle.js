@@ -1,7 +1,8 @@
 const width = screen.availWidth-300;
 const height = screen.availHeight;
  
-function setup() {
+function setup() 
+{
   createCanvas(width+300, height);
 }
  
@@ -24,37 +25,59 @@ const downPressedMouse = new Set();
  
  
 /**all event keys with length 1 get converted to lowercase*/
-window.addEventListener("keydown", function (event) {
-  if (event.defaultPrevented) {
-    return;}
- 
-  let temp_str = event.key;
-  if (temp_str.length==1){
-    temp_str = temp_str.toLowerCase();}
- 
-    downPressedKeys.add((temp_str));})
-/**all event keys with length 1 get converted to lowercase*/
-window.addEventListener("keyup", function (event) {
-  if (event.defaultPrevented) {
-    return;}
- 
-  let temp_str = event.key;
-  if (temp_str.length==1){
-    temp_str = temp_str.toLowerCase();}
- 
-  downPressedKeys.delete((temp_str));})
- 
-window.addEventListener("mousedown", function (event) {
-  if (event.defaultPrevented) {
-    return;}
-    downPressedMouse.add(event.key);})
-window.addEventListener("mouseup", function (event) {
-  if (event.defaultPrevented) {
+window.addEventListener("keydown", function (event) 
+{
+  if (event.defaultPrevented) 
+  {
     return;
   }
-  downPressedMouse.delete(event.key);})
  
-class Projectile{
+  let temp_str = event.key;
+  if (temp_str.length==1)
+  {
+    temp_str = temp_str.toLowerCase();
+  }
+ 
+    downPressedKeys.add((temp_str));
+});
+
+/**all event keys with length 1 get converted to lowercase*/
+window.addEventListener("keyup", function (event) 
+{
+  if (event.defaultPrevented) 
+  {
+    return;
+  }
+ 
+  let temp_str = event.key;
+  if (temp_str.length==1)
+  {
+    temp_str = temp_str.toLowerCase();
+  }
+ 
+  downPressedKeys.delete((temp_str));
+});
+ 
+window.addEventListener("mousedown", function (event) 
+{
+  if (event.defaultPrevented) 
+  {
+    return;
+  }
+    downPressedMouse.add(event.key);
+});
+
+window.addEventListener("mouseup", function (event) 
+{
+  if (event.defaultPrevented) 
+  {
+    return;
+  }
+  downPressedMouse.delete(event.key);
+})
+ 
+class Projectile
+{
   constructor(radius,color,pos_x,pos_y,vel_x,vel_y,acc_x = 0,acc_y = 0)
   {
     this.radius = radius;
@@ -101,16 +124,20 @@ class Projectile{
   /**returns true if should delete projectile, false if should keep projectile */
   should_destroy(forgiving_x = 0,forgiving_y = 0)
   {
-    if (this.pos_x-this.radius>width+forgiving_x){
+    if (this.pos_x-this.radius>width+forgiving_x)
+    {
       return true;
     }
-    if (this.pos_x+this.radius<-forgiving_x){
+    if (this.pos_x+this.radius<-forgiving_x)
+    {
       return true;
     }
-    if (this.pos_y-this.radius>height+forgiving_y){
+    if (this.pos_y-this.radius>height+forgiving_y)
+    {
       return true;
     }
-    if (this.pos_y+this.radius<-forgiving_y){
+    if (this.pos_y+this.radius<-forgiving_y)
+    {
       return true;
     }        
     return false;
@@ -143,9 +170,11 @@ class Projectile{
   }
 }
  
-class Player {
+class Player 
+{
   /**player color is just for the trail*/
-  constructor(pos_x,pos_y,radius,color,speed,speed_slowed,speed_fast,total_health,immunity_frames) {
+  constructor(pos_x,pos_y,radius,color,speed,speed_slowed,speed_fast,total_health,immunity_frames) 
+  {
     this.pos_x = pos_x;
     this.pos_y = pos_y;
     this.radius = radius;
@@ -180,8 +209,11 @@ class Player {
     this.y_max = height;
  
   }
-  draw() {
-    if (this.immunity()){
+
+  draw() 
+  {
+    if (this.immunity())
+    {
       for (let i = 0; i < this.color_trail_num; i++)
       {
         fill(player.color);
@@ -192,7 +224,8 @@ class Player {
       fill([255,255,255]);
       circle(this.pos_x,this.pos_y,this.radius*2);
     }
-    else{
+    else
+    {
       for (let i = 0; i < this.color_trail_num; i++)
       {
         fill([255,0,0]);
@@ -205,7 +238,8 @@ class Player {
     }
   }
  
-  move() {
+  move() 
+  {
     let temp_move_x = 0,temp_move_y = 0;
     //the capital thing should probs never occur
     if (downPressedKeys.has('w') || downPressedKeys.has('ArrowUp'))
@@ -235,7 +269,8 @@ class Player {
       this.pos_x += temp_move_x * this.speed_fast;
       this.pos_y += temp_move_y * this.speed_fast;
     }
-    else{
+    else
+    {
       this.pos_x += temp_move_x * this.speed;
       this.pos_y += temp_move_y * this.speed;
     }
@@ -275,8 +310,10 @@ class Player {
     this.draw();
   }
  
-  immunity() {
-    if (this.current_immunity_frames>this.total_immunity_frames) {
+  immunity() 
+  {
+    if (this.current_immunity_frames>this.total_immunity_frames) 
+    {
       return true;
     }
     return false;
@@ -291,7 +328,8 @@ class Player {
     }
   }
  
-  collision(proj_list) {
+  collision(proj_list) 
+  {
     for (let i = 0; i < proj_list.length; i++)
       if (  (this.pos_x-proj_list[i].pos_x)**2+(this.pos_y-proj_list[i].pos_y)**2  < (this.radius+proj_list[i].radius-3)**2)
       {
@@ -301,12 +339,14 @@ class Player {
     return;
   }
  
-  is_alive() {
+  is_alive() 
+  {
     return this.current_health > 0;
   }
 }
  
-function distance(x1,y1,x2,y2) {
+function distance(x1,y1,x2,y2) 
+{
   return sqrt((x2-x1)**2+(y2-y1)**2);
 }
  
@@ -317,7 +357,8 @@ function draw_circle(pos_x,pos_y,radius,color,should_draw_border,color_outline)
   {
     stroke(color_outline);
   }
-  else{
+  else
+  {
     noStroke();
   }
   circle(pos_x,pos_y,radius*2);
@@ -333,7 +374,8 @@ function draw_line(x1,y1,x2,y2,color)
  
 //https://stackoverflow.com/questions/1527803/generating-random-whole-numbers-in-javascript-in-a-specific-range
 /** the min must be lower than the max */
-function random_int(min, max) {
+function random_int(min, max) 
+{
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -407,7 +449,8 @@ class Main_update_class
     }
  
     //only executes attack after a cretain amnt of time
-    if (this.timer>0){
+    if (this.timer>0)
+    {
       this.spiral_1_angle+=this.spiral_1_angle_incr;
       this.spiral_1_angle_acc+=this.spiral_1_angle_incr_acc;
  
