@@ -488,7 +488,7 @@ class Main_update_class
 
     this.ATTACK_INDEX_RETURN_TO = 0; // index in the array
 
-    this.attack_arr = [this.SPIRAL_1,this.SPIRAL_2,this.SPIRAL_3,this.SPIRAL_4,this.EXAMPLE_ATTACK];
+    this.attack_arr = [this.SPIRAL_1,this.SPIRAL_4,this.SPIRAL_2,this.SPIRAL_1,this.SPIRAL_3,this.SPIRAL_4,this.EXAMPLE_ATTACK];
     this.attack_index = 0;
   }
 
@@ -624,7 +624,7 @@ class Main_update_class
 
     this.spiral_3_angle = random_float(0,2*Math.PI);
     this.spiral_3_angle_incr = random_float(Math.PI/5,Math.PI/1.5);
-    this.spiral_3_mod = 6; // proejctiles generated every 2 frames (60 frames per second)
+    this.spiral_3_mod = 4; // proejctiles generated every 2 frames (60 frames per second)
     this.spiral_3_color = [random_float(0,255),0,random_float(0,255),random_float(0,255)];
     this.spiral_3_speed = random_float(4,6);
   }
@@ -643,9 +643,9 @@ class Main_update_class
         this.spiral_4_color[i] = 0;
         this.spiral_4_color_incr[i] = random_float(0.2,0.5);
       }
-      else if (this.spiral_4_color[i]>=60)
+      else if (this.spiral_4_color[i]>=150)
       {
-        this.spiral_4_color[i] = 60;
+        this.spiral_4_color[i] = 150;
         this.spiral_4_color_incr[i] = -random_float(0.2,0.5);
       }
     }
@@ -658,11 +658,11 @@ class Main_update_class
     if (this.timer%(difficulty*this.spiral_3_mod)==0)
     {
       let temp_proj = new Projectile(30,[this.spiral_4_color[0],this.spiral_4_color[1],this.spiral_4_color[2],255],width/2,height/2,
-        this.spiral_3_speed*Math.cos(this.spiral_3_angle),this.spiral_3_speed*Math.sin(this.spiral_3_angle),0,0.02);
+        this.spiral_3_speed*Math.cos(this.spiral_3_angle),this.spiral_3_speed*Math.sin(this.spiral_3_angle),0,0.03);
       this.projectiles.push(temp_proj);
 
-      temp_proj = new Projectile(30,[255-this.spiral_4_color[0],255-this.spiral_4_color[1],255-this.spiral_4_color[2],110],width/2,height/2,
-        this.spiral_3_speed*Math.cos(this.spiral_3_angle),this.spiral_3_speed*Math.sin(this.spiral_3_angle),0,-0.02);
+      temp_proj = new Projectile(30,[255-this.spiral_4_color[0],255-this.spiral_4_color[1],255-this.spiral_4_color[2],170],width/2,height/2,
+        this.spiral_3_speed*Math.cos(this.spiral_3_angle),this.spiral_3_speed*Math.sin(this.spiral_3_angle),0,-0.03);
       
       this.projectiles.push(temp_proj);
     }
@@ -751,7 +751,7 @@ class Main_update_class
     this.example_attack_time_end = 60*20;
 
     this.example_attack_angle = random_float(0,2*Math.PI);
-    this.example_attack_angle_increment = random_float(0.01,0.02);
+    this.example_attack_angle_increment = random_float(0.02,0.03);
 
     this.example_attack_num1 = random_float(2,6);
     this.example_attack_num2 = random_float(2,6);
@@ -770,12 +770,12 @@ class Main_update_class
 
     this.example_attack_angle += Math.PI/2+this.example_attack_angle_increment; 
 
-    if (this.timer%(difficulty*5) == 0)
+    if (this.timer%(difficulty*3) == 0)
     {
       let temp_proj = new Projectile(this.radius,[255,0,0,255-254*this.timer/this.example_attack_time_end],width/2,height/2
       ,this.example_attack_num1 * Math.cos(this.example_attack_angle),
       this.example_attack_num2 * Math.sin(this.example_attack_angle)
-      ,0,0);
+      ,0,0.2);
       
       this.projectiles.push(temp_proj);
 
@@ -907,8 +907,6 @@ class Main_update_class
           console.log('out of attack arr bounds');
       }
 
-      //console.log(this.projectiles.length);
-
       if (finished_attack)
       {
         console.log(this.attack_index);
@@ -929,33 +927,32 @@ class Main_update_class
 
 let main_update_object = new Main_update_class(); // USED FOR ALL ATTACKS
 
-
 let global_questions = [
-'What is the integral of 2x?'
-,'Who is the first president of the United States'
-,'What is seven squared?'
-,'What is the best candy?'
-,'What is the best mathematical formula?'
-,'Recyle????'
-,'The sum of the first 100 positive integers'
-,'What is the best game?'
-,'What is the RGB value of Blue?'
-,'How many dozen eggs are in 1 dozen eggs?'
-]
-
-//make correct answer the first answer
-let global_answers = [
-['x^2+C','2x^2+C','2x+C','2+C'],
-['george washington','sahan','michael','darmal'],
-['63','34','7','49'],
-['hichew','not hichew','not hichew','not hichew'],
-['Shoelace Formula','Vietas Formula','Pythagorean Theorem','Completing the Rectangle'],
-['RECYLE!!!!!!!!!!!!!!','yES','sure','absolutely'],
-['5050','100','1000','505'],
-['This game','not this game','not this game','not this game'],
-['(0,0,255)','Blue','(255,0,0)','(0,255,0)'],
-['1','12','144','24']
-]
+  'What is the integral of 2x?'
+  ,'Who is the first president of the United States'
+  ,'What is the capital of Canada?'
+  ,'What does SHOELACE FORMULA give you?'
+  ,'If x^2+2x+1 = 4, what is the positive integer solution for x?'
+  ,'What is the exact value of Tau?'
+  ,'The sum of the first 100 positive integers'
+  ,'When was the guillotine invented?'
+  ,'What is the RGB value of Blue?'
+  ,'How many dozen eggs are in 1 dozen eggs?'
+  ]
+  
+  //make correct answer the first answer
+  let global_answers = [
+  ['x^2+C','2x^2+C','2x+C','2+C'],
+  ['George Washington','Sahan','Michael and Alvin','Darmal'],
+  ['Ottawa','Toronto','Montreal','Vancouver'],
+  ['Area','Perimeter','The length of your Shoelace','Surface Area'],
+  ['1','-3','1, -3','5'],
+  ['The ratio of the circumference to the radius','6.28','6','3*Pi'],
+  ['5050','100','1000','505'],
+  ['1792','1802','1812','1782'],
+  ['(0,0,255)','Blue','(255,0,0)','(0,255,0)'],
+  ['1','12','144','24']
+  ]
 
 //make sure its in 60 fps -- > value of 120 would be 2 seconds
 let global_time_wait = 320;
@@ -1211,12 +1208,23 @@ function update_main_loop()
       {
         if (player.immunity())
         {
-          global_score+=Math.log(player.current_immunity_frames)*global_point_multiplier/20;
+          if (global_player_ans == global_location_correct_ans)
+          {
+            global_score+=Math.sqrt(player.current_immunity_frames)*global_point_multiplier/20;
+          }
+          else
+          {
+            global_score+=(player.current_immunity_frames**0.25)*global_point_multiplier/20;
+          }
           global_timer_text_box.style.color = "black";
         }
         else
         {
-          global_score -= (5/Math.sqrt(global_point_multiplier));
+          global_score -= (10/global_point_multiplier);
+          if (global_score<0)
+          {
+            global_score = 0;
+          }
           global_timer_text_box.style.color = "red";
         }
     
@@ -1249,7 +1257,7 @@ function update_main_loop()
     {
       temp_color = [0,255,0];
     }
-    draw_circle(temp_pos_x,temp_pos_y,player.radius,temp_color,true,temp_color)
+    draw_circle(temp_pos_x+width/2,temp_pos_y+height/2,player.radius,temp_color,true,temp_color)
   }
   player.update();
   draw_line(0,height/2,width,height/2,[0,0,0]);
@@ -1275,8 +1283,8 @@ function publish_position()
     clientId: myId,
     gameCode: roomCode,
     player: {
-      x: Math.floor(player.pos_x),
-      y: Math.floor(player.pos_y),
+      x: Math.floor(player.pos_x-width/2),
+      y: Math.floor(player.pos_y-height/2),
       score: Math.floor(global_score),
       iframes: player.current_immunity_frames,
       nickname: myNickname
