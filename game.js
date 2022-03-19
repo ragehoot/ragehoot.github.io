@@ -18,7 +18,11 @@ const realtime = Ably.Realtime(
 });
 
 
-let global_rand_arr; 
+let global_rand_arr = []; 
+
+for (let i = 0; i < 53; i++) {
+  global_rand_arr.push(Math.random());
+}
 
 /*
 global_player_arr = {
@@ -411,7 +415,6 @@ function draw_line(x1,y1,x2,y2,color)
 //https://stackoverflow.com/questions/1527803/generating-random-whole-numbers-in-javascript-in-a-specific-range
 /** the min must be lower than the max */
 
-global_rand_arr = [Math.random(),Math.random(),Math.random(),Math.random()];
 function random_int(min, max) 
 {
   min = Math.ceil(min);
@@ -1035,14 +1038,15 @@ let global_angle_increment = 0.03;
 let global_speed = 5;
 let global_radius = 40;
 
-background(255,255,255);
+//background(255,255,255);
 
 let global_global_timer_never_reset = 0;
-function update_main_loop(){
+function update_main_loop()
+{
+  global_global_timer_never_reset+=1;
   if (!global_continue_waiting_for_start_really_long_variable_name_hello_future_viewers)
   {
     background(255,255,255);
-    global_global_timer_never_reset+=1;
 
     global_timer+=1;
 
@@ -1110,31 +1114,31 @@ function update_main_loop(){
       }
     }
 
-    for (const p_id in global_player_arr) {
 
-      let curPlayer = global_player_arr[p_id];
-
-      let temp_pos_x = curPlayer.x; 
-      let temp_pos_y = curPlayer.y;
-      let temp_current_immunity_frames = curPlayer.iframes; 
-      let temp_color;
-      if (temp_current_immunity_frames > this.total_immunity_frames)
-      {
-        temp_color = [0,255,0];
-      }
-      else
-      {
-        temp_color = [255,0,0];
-      }
-      draw_circle(temp_pos_x,temp_pos_y,player.radius,temp_color,true,temp_color)
-    }
-
-    // publish position
-    if (global_global_timer_never_reset % 6 == 0) 
-    {
-      publish_position();
-    }
   } 
+  // publish position
+  if (global_global_timer_never_reset > 60 && global_global_timer_never_reset % 30 == 1) 
+  {
+    publish_position();
+  }
+  for (const p_id in global_player_arr) {
+    if (p_id == myClientId) continue;
+    let curPlayer = global_player_arr[p_id];
+
+    let temp_pos_x = curPlayer.x; 
+    let temp_pos_y = curPlayer.y;
+    let temp_current_immunity_frames = curPlayer.iframes; 
+    let temp_color;
+    if (temp_current_immunity_frames > this.total_immunity_frames)
+    {
+      temp_color = [255,0,0];
+    }
+    else
+    {
+      temp_color = [0,255,0];
+    }
+    draw_circle(temp_pos_x,temp_pos_y,player.radius,temp_color,true,temp_color)
+  }
   player.update();
   draw_line(0,height/2,width,height/2,[0,0,0]);
   draw_line(width/2,0,width/2,height,[0,0,0]);
@@ -1150,12 +1154,11 @@ function publish_position()
 {
   gameRoomChannel.publish("player-data", 
   {
-    x: player.pos_x,
-    y: player.pos_y,
+    x: Math.floor(player.pos_x),
+    y: Math.floor(player.pos_y),
     score: global_score,
     iframes: player.current_immunity_frames
   }); // player.current_immunity_frames
 }  
-
 
 setInterval(update_main_loop,1000/60);

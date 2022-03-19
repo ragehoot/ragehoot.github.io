@@ -10,7 +10,7 @@ const Ably = require("ably");
 
 const ABLY_API_KEY = process.env.ABLY_API_KEY;
 
-const TICK_MS = 250;
+const TICK_MS = 500;
 
 let players = {};
 let totalPlayers = 0;
@@ -60,7 +60,6 @@ realtime.connection.once("connected", () => {
     gameRoomChannel.subscribe("start", (msg) => {
         console.log("starting game, code: " + gameCode);
         sendAttack();
-        gameInterval = setInterval(gameTick, TICK_MS);
     });
 });
 
@@ -73,12 +72,13 @@ function gameTick() {
     tickCounter++;
 }
 
+gameInterval = setInterval(gameTick, TICK_MS);
+
 function sendAttack() {
     let randArr = [];
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 53; i++) {
         randArr.push(Math.random());
     }
-    let randInt = Math.floor(Math.random() * 10);
     gameRoomChannel.publish("random-arr", {
         randomArr: randArr,
     });
